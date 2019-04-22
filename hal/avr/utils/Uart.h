@@ -127,7 +127,7 @@ namespace lib::avr::uart {
         }
     public:
         template<unsigned long baudrate, Speed transmissionSpeed, TransmissionMode mode, StopBits stopBits, DataBits dataBits>
-        static constexpr void initUart() {
+        static constexpr void init() {
 
             if constexpr (transmissionSpeed == Speed::Double) {
                 setBaudrate<(baudrate / 2)>();

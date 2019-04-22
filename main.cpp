@@ -14,16 +14,18 @@ using mcu = lib::avr::ATMega328;
 
 int main() {
     using namespace  lib::avr::uart::literals;
-    namespace uart = lib::avr::uart;
+    namespace uartNS = lib::avr::uart;
+    using uart = uartNS::UartHal<mcu, 0>;
+
     using PortB = lib::Hal::Port<lib::avr::B, mcu>;
     using PinB0 = lib::Hal::Pin<PortB, 0>;
 
     PinB0::dir<PinB0::Output>();
-    uart::UartHal<mcu, 0>::initUart<9600_baud, uart::Speed::Double, uart::TransmissionMode::FullDuplex, uart::StopBits::One, uart::DataBits::Eight>();
+    uart::init<9600_baud, uartNS::Speed::Double, uartNS::TransmissionMode::FullDuplex, uartNS::StopBits::One, uartNS::DataBits::Eight>();
 
     while(true) {
         PinB0::flip();
-        uart::UartHal<mcu, 0>::sendData("Hallo Welt!\n\r");
+        uart::sendData("Hallo Welt!\n\r");
         _delay_ms(500);
     }
 }
