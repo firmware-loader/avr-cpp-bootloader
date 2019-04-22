@@ -128,7 +128,13 @@ namespace lib::avr::uart {
     public:
         template<unsigned long baudrate, Speed transmissionSpeed, TransmissionMode mode, StopBits stopBits, DataBits dataBits>
         static constexpr void initUart() {
-            setBaudrate<baudrate>();
+
+            if constexpr (transmissionSpeed == Speed::Double) {
+                setBaudrate<(baudrate / 2)>();
+            } else {
+                setBaudrate<baudrate>();
+            }
+
             setDoubleSpeed<transmissionSpeed>();
             setTransmissionMode<mode>();
             setStopBits<stopBits>();
@@ -136,8 +142,9 @@ namespace lib::avr::uart {
         }
 
         static constexpr void sendData(const char* data) {
-            for(uint8_t i = 0; i < sizeof(data); i++) {
-                sendChar(data[i]);
+            auto i = 0;
+            while(data[i] != '\0') {
+                sendChar(data[i++]);
             }
         }
 
