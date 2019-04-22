@@ -17,9 +17,9 @@ int main() {
     namespace uart = lib::avr::uart;
     using PortB = lib::Hal::Port<lib::avr::B, mcu>;
     using PinB0 = lib::Hal::Pin<PortB, 0>;
-    
+
     PinB0::dir<PinB0::Output>();
-    uart::UartHal<mcu, 0>::initUart<9600_baud, true, uart::TransmissionMode::FullDuplex, uart::StopBits::One, uart::DataBits::Eight>();
+    uart::UartHal<mcu, 0>::initUart<9600_baud, uart::Speed::Double, uart::TransmissionMode::FullDuplex, uart::StopBits::One, uart::DataBits::Eight>();
 
     while(true) {
         PinB0::flip();

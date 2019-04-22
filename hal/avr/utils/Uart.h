@@ -13,6 +13,11 @@ namespace lib::avr::uart {
         FullDuplex
     };
 
+    enum class Speed {
+        Normal,
+        Double
+    };
+
     enum class StopBits {
         One,
         Two
@@ -76,9 +81,9 @@ namespace lib::avr::uart {
             }
         }
 
-        template<bool doubleSpeed>
+        template<Speed transmissionSpeed>
         static constexpr void setDoubleSpeed() {
-            if constexpr(doubleSpeed) {
+            if constexpr(transmissionSpeed == Speed::Double) {
                 uart()->ucsra.add(ucsra::u2x);
             } else {
                 uart()->ucsra.clear(ucsra::u2x);
@@ -121,10 +126,10 @@ namespace lib::avr::uart {
             }
         }
     public:
-        template<unsigned long baudrate, bool doubleSpeed, TransmissionMode mode, StopBits stopBits, DataBits dataBits>
+        template<unsigned long baudrate, Speed transmissionSpeed, TransmissionMode mode, StopBits stopBits, DataBits dataBits>
         static constexpr void initUart() {
             setBaudrate<baudrate>();
-            setDoubleSpeed<doubleSpeed>();
+            setDoubleSpeed<transmissionSpeed>();
             setTransmissionMode<mode>();
             setStopBits<stopBits>();
             setDataBits<dataBits>();
