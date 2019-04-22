@@ -8,20 +8,19 @@
 #include "hal/avr/Register.h"
 #include "hal/avr/pin/Control.h"
 #include "hal/avr/utils/Uart.h"
+#include "software/uart/SoftwareUart.h"
 
 
 using mcu = lib::avr::ATMega328;
 
 int main() {
-    using namespace  lib::avr::uart::literals;
-    namespace uartNS = lib::avr::uart;
-    using uart = uartNS::UartHal<mcu, 0>;
-
+    using namespace lib::software::literals;
     using PortB = lib::Hal::Port<lib::avr::B, mcu>;
     using PinB0 = lib::Hal::Pin<PortB, 0>;
+    using uart = lib::software::Uart<mcu>;
 
     PinB0::dir<PinB0::Output>();
-    uart::init<9600_baud, uartNS::Speed::Double, uartNS::TransmissionMode::FullDuplex, uartNS::StopBits::One, uartNS::DataBits::Eight>();
+    uart::init<9600_baud>();
 
     while(true) {
         PinB0::flip();

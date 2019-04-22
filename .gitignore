@@ -161,3 +161,7 @@ _deps
 \.idea/
 
 bin/
+
+fullout\.txt
+
+create_tmp\.sh

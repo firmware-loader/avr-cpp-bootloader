@@ -31,21 +31,6 @@ namespace lib::avr::uart {
         Nine
     };
 
-    class Baud {
-    public:
-        constexpr Baud(unsigned long long baudrate) : mBaudrate{baudrate}{ }
-        constexpr operator unsigned long() const { return static_cast<unsigned long>(mBaudrate); }
-    private:
-        unsigned long long mBaudrate;
-    };
-
-    namespace literals {
-        constexpr Baud operator"" _baud ( unsigned long long baud )
-        {
-            return Baud{baud};
-        }
-    }
-
     template<typename MicroController, typename MicroController::mem_width UartChannel>
     class UartHal {
     private:
