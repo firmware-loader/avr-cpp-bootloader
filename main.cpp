@@ -5,9 +5,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include "hal/avr/mcus/mega328/Mega328.h"
-#include "hal/avr/Register.h"
 #include "hal/avr/pin/Control.h"
-#include "hal/avr/utils/Uart.h"
 #include "software/uart/SoftwareUart.h"
 
 
