@@ -23,7 +23,7 @@
 #include "../../utils/AvrUtils.h"
 #include "../../Register.h"
 #include "../../../../lib/type_traits.h"
-#include "../../../AdcFamilies.h"
+#include "../../../MCUFamilies.h"
 
 namespace lib::avr {
         struct ATMega328 final
