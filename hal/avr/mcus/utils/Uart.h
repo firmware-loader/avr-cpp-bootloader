@@ -121,7 +121,7 @@ namespace lib::avr::uart {
             }
         }
 
-        static constexpr void sendChar(const char character) {
+        static constexpr void sendChar(uint8_t character) {
             while(!uart()->ucsra.isSet(ucsra::udre)) { }
             *uart()->udr |= character;
         }
