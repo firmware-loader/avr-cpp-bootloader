@@ -9,5 +9,3 @@ enum class MCUFamilies {
     STM32
 };
 
-
-

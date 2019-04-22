@@ -37,7 +37,7 @@ SET(CMAKE_C_COMPILER ${AVRBIN}/avr-gcc)
 SET(CMAKE_CXX_COMPILER ${AVRBIN}/avr-g++)
 
 SET(CMAKE_C_FLAGS  "-Os -mmcu=${DEVICE} ${ASM_FLAG} -DBOOT_BAUD_RATE=9600 -DF_CPU=${FREQ}UL -std=gnu99 -Wl,--gc-sections")
-SET(CMAKE_CXX_FLAGS "-Os -mmcu=${DEVICE} ${ASM_FLAG} -DBOOT_BAUD_RATE=9600 -DF_CPU=${FREQ}UL -Wl,--gc-sections -fconcepts")
+SET(CMAKE_CXX_FLAGS "-Os -mmcu=${DEVICE} ${ASM_FLAG} -DBOOT_BAUD_RATE=9600 -DF_CPU=${FREQ}UL -Wl,--gc-sections -fconcepts -Wall -Wextra")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 set(CMAKE_PREFIX_PATH  "/home/sebastian/avr-gcc/avr-gcc-8.3.0-x64-linux/")
