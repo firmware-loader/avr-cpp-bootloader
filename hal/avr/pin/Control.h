@@ -26,9 +26,9 @@
 namespace lib::Hal {
         template<typename PortName, typename MicroController>
         class Port {
-            Port() = delete;
             static inline constexpr auto port = avr::getAddress<typename MicroController::Port, PortName>;
         public:
+            Port() = delete;
             typedef PortName portname_type;
 
             static volatile uint8_t& ddr() {
@@ -44,9 +44,9 @@ namespace lib::Hal {
 
         template<typename Port, uint8_t Number>
         class Pin {
-            Pin() = delete;
             static_assert(Number < 8);
         public:
+            Pin() = delete;
             struct Output {};
             struct Input {};
             static inline constexpr uint8_t mask = 1 << Number;
@@ -87,35 +87,6 @@ namespace lib::Hal {
                 T::template dir<T::Output>();
             };
         }
-
-    /*template<typename... Pins>
-    requires
-    (sizeof...(Pins) >= 1) &&
-    (sizeof...(Pins) <= 8) &&
-    (std::is_same<typename Meta::front<Meta::List<Pins...>>::port_type, typename Pins::port_type>::value && ...) &&
-    (isPin<Pins>() && ...)*/
-        /*class PinSet {
-            PinSet() = delete;
-            static_assert(sizeof...(Pins) >= 1);
-            static_assert(sizeof...(Pins) <= 8);
-
-            using pinList = Meta::List<Pins...>;
-            using firstPin = Meta::front<pinList>;
-            using port_type = typename firstPin::port_type;
-            //static_assert((std::is_same<port_type, typename Pins::port_type>::value && ...), "all pins must use the same port");
-
-        public:
-            template<typename Dir>
-            static void dir() {
-                (Pins::template dir<Dir>(), ...);
-            }
-            static void allOn() {
-                (Pins::on(), ...);
-            }
-            static void allOff() {
-                (Pins::off(), ...);
-            }
-        private:*/
 }
 
 

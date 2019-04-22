@@ -39,13 +39,29 @@ namespace lib {
             {
                 hwRegister |= static_cast<value_type>(F);
             }
+            template<typename... T>
+            void inline add(T... v)
+            {
+                static_assert((std::is_same<T, BitType>::value & ...));
+                hwRegister |= (static_cast<value_type>(v) | ...);
+            }
             template<BitType F>
             void inline clear()
             {
                 hwRegister &= ~static_cast<value_type>(F);
             }
+            template<typename... T>
+            void inline clear(T... v)
+            {
+                static_assert((std::is_same<T, BitType>::value & ...));
+                hwRegister &= ~(static_cast<value_type>(v) & ...);
+            }
             template<BitType Mask>
             [[nodiscard]] inline BitType get()
+            {
+                return static_cast<BitType>(hwRegister & static_cast<value_type>(Mask));
+            }
+            [[nodiscard]] inline BitType get(BitType Mask)
             {
                 return static_cast<BitType>(hwRegister & static_cast<value_type>(Mask));
             }
@@ -56,6 +72,10 @@ namespace lib {
             }
             template<BitType F>
             bool inline isSet()
+            {
+                return hwRegister & static_cast<value_type>(F);
+            }
+            bool inline isSet(BitType F)
             {
                 return hwRegister & static_cast<value_type>(F);
             }
