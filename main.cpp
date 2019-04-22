@@ -20,7 +20,7 @@ int main() {
 
     while(true) {
         PinB0::flip();
-        lib::avr::uart::UartHal<mcu, 0>::sendData("Hello World!");
+        lib::avr::uart::UartHal<mcu, 0>::sendChar('a');
         _delay_ms(500);
     }
 }

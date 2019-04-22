@@ -34,7 +34,7 @@ namespace lib::avr::uart {
         using ucsra = typename MicroController::Uart::UCSRA;
         using ucsrc = typename MicroController::Uart::UCSRC;
 
-        template<uint32_t baudrate>
+        template<unsigned long baudrate>
         [[nodiscard]] static constexpr auto calculateBaudValue() {
             return ((F_CPU+baudrate*8)/(baudrate*16)-1);
         }
@@ -42,16 +42,15 @@ namespace lib::avr::uart {
         template<auto baudrate>
         static constexpr void setBaudrate() {
             auto baudValue = calculateBaudValue<baudrate>();
-            *uart()->ubrrl = baudValue >> 8;
-            *uart()->ubrrh = baudValue & 0xFF;
+            *uart()->ubrrh = baudValue >> 8;
+            *uart()->ubrrl = baudValue & 0xFF;
         }
 
         template<TransmissionMode mode>
         static constexpr void setTransmissionMode() {
             switch(mode) {
                 case TransmissionMode::FullDuplex:
-                    uart()->ucsrb.add(ucsrb::txen);
-                    uart()->ucsrb.add(ucsrb::rxen);
+                    uart()->ucsrb.add(ucsrb::txen, ucsrb::rxen);
                     break;
                 case TransmissionMode::SimplexRX:
                     uart()->ucsrb.add(ucsrb::rxen);
@@ -75,7 +74,7 @@ namespace lib::avr::uart {
         static constexpr void setStopBits() {
             switch(stopBits) {
                 case StopBits::One:
-                    uart()->ucsrc.clear(ucsrc::usbs);
+                //    uart()->ucsrc.clear(ucsrc::usbs);
                     break;
                 case StopBits::Two:
                     uart()->ucsrc.add(ucsrc::usbs);
@@ -87,29 +86,22 @@ namespace lib::avr::uart {
         static constexpr void setDataBits() {
             switch(dataBits) {
                 case DataBits::Five:
-                    uart()->ucsrc.clear(ucsrc::ucsz0);
-                    uart()->ucsrc.clear(ucsrc::ucsz1);
-                    uart()->ucsrc.clear(ucsrc::ucsz2);
+                    uart()->ucsrc.clear(ucsrc::ucsz0, ucsrc::ucsz1, ucsrc::ucsz2);
                     break;
                 case DataBits::Six:
                     uart()->ucsrc.add(ucsrc::ucsz0);
-                    uart()->ucsrc.clear(ucsrc::ucsz1);
-                    uart()->ucsrc.clear(ucsrc::ucsz2);
+                    //uart()->ucsrc.clear(ucsrc::ucsz1, ucsrc::ucsz2);
                     break;
                 case DataBits::Seven:
-                    uart()->ucsrc.clear(ucsrc::ucsz0);
                     uart()->ucsrc.add(ucsrc::ucsz1);
-                    uart()->ucsrc.clear(ucsrc::ucsz2);
+                    //uart()->ucsrc.clear(ucsrc::ucsz0, ucsrc::ucsz2);
                     break;
                 case DataBits::Eight:
-                    uart()->ucsrc.add(ucsrc::ucsz0);
-                    uart()->ucsrc.add(ucsrc::ucsz1);
-                    uart()->ucsrc.clear(ucsrc::ucsz2);
+                    uart()->ucsrc.add(ucsrc::ucsz0, ucsrc::ucsz1);
+                    //uart()->ucsrc.clear(ucsrc::ucsz2);
                     break;
                 case DataBits::Nine:
-                    uart()->ucsrc.add(ucsrc::ucsz0);
-                    uart()->ucsrc.add(ucsrc::ucsz1);
-                    uart()->ucsrc.add(ucsrc::ucsz2);
+                    uart()->ucsrc.add(ucsrc::ucsz0, ucsrc::ucsz1, ucsrc::ucsz2);
                     break;
             }
         }
