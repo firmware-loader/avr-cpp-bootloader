@@ -20,7 +20,7 @@
 
 # include <avr/io.h>
 
-#include "../utils/AvrUtils.h"
+#include "../../utils/AvrUtils.h"
 #include "../../Register.h"
 #include "../../../../lib/type_traits.h"
 #include "../../../AdcFamilies.h"

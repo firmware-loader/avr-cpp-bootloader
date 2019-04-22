@@ -7,7 +7,7 @@
 #include "hal/avr/mcus/mega328/Mega328.h"
 #include "hal/avr/Register.h"
 #include "hal/avr/pin/Control.h"
-#include "hal/avr/mcus/utils/Uart.h"
+#include "hal/avr/utils/Uart.h"
 
 
 using mcu = lib::avr::ATMega328;
