@@ -9,7 +9,7 @@ SET(CMAKE_CXX_STANDARD 20)
 #============================================================================================
 PROJECT(Bootloader)		  		# <-- Prjektname
 
-SET(FILES main.cpp hal/avr/mcus/mega328/Mega328.h hal/avr/Register.h lib/type_traits.h software/uart/SoftwareUart.h concepts/McuCheck.h hal/avr/pin/Control.h hal/avr/utils/AvrUtils.h hal/avr/utils/Uart.h hal/MCUFamilies.h)		  	# <-- Quelldatei(en)
+SET(FILES main.cpp hal/avr/mcus/mega328/Mega328.h hal/avr/Register.h lib/type_traits.h abstraction/uart/AbstractUart.h concepts/McuCheck.h hal/avr/pin/Control.h hal/avr/utils/AvrUtils.h hal/avr/utils/Uart.h hal/MCUFamilies.h software/uart/SoftwareUart.h)		  	# <-- Quelldatei(en)
 
 SET(DEVICE atmega328p)			# <-- MCU
 SET(FREQ 1000000)			# <-- MCU-Frequenz

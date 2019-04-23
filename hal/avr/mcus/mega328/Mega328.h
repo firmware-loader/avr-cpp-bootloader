@@ -77,7 +77,7 @@ namespace lib::avr {
             };
 
             struct Timer8Bit {
-                static constexpr const uint8_t count = 2;
+                static constexpr uint8_t count = 2;
                 using value_type = uint8_t;
                 enum class TCCRA : uint8_t {
                     coma0 = (1 << COM0A0),
@@ -101,6 +101,55 @@ namespace lib::avr {
                 DataRegister<Timer8Bit, ReadWrite> tcnt;
                 DataRegister<Timer8Bit, ReadWrite> ocra;
                 DataRegister<Timer8Bit, ReadWrite> ocrb;
+                template<int N> struct address;
+            };
+
+            struct Timer16Bit {
+                static constexpr uint8_t count = 1;
+
+                using value_type = uint8_t;
+                enum class TCCRA : uint8_t {
+                    coma0 = (1 << COM1A0),
+                    coma1 = (1 << COM1A1),
+                    comb0 = (1 << COM1B0),
+                    comb1 = (1 << COM1B1),
+                    wgm0 = (1 << WGM10),
+                    wgm1 = (1 << WGM11)
+                };
+                ControlRegister<Timer16Bit, TCCRA> tccra;
+                enum class TCCRB : uint8_t {
+                    icnc = (1 << ICNC1),
+                    ices = (1 << ICES1),
+                    wgm3 = (1 << WGM13),
+                    wgm2 = (1 << WGM12),
+                    cs2 = (1 << CS12),
+                    cs1 = (1 << CS11),
+                    cs0 = (1 << CS10),
+                };
+
+                ControlRegister<Timer16Bit, TCCRB> tccrb;
+
+                enum class TCCRC : uint8_t {
+                    foca = (1 << FOC1A),
+                    focb = (1 << FOC1B),
+                };
+
+                ControlRegister<Timer16Bit, TCCRC> tccrc;
+
+                DataRegister<Timer16Bit, UnUsed, mem_width> reserved;
+
+                DataRegister<Timer16Bit, ReadWrite> tcntl;
+                DataRegister<Timer16Bit, ReadWrite> tcnth;
+
+                DataRegister<Timer16Bit, ReadOnly> icrl;
+                DataRegister<Timer16Bit, ReadOnly> icrh;
+
+                DataRegister<Timer16Bit, ReadWrite> orcal;
+                DataRegister<Timer16Bit, ReadWrite> ocrah;
+
+                DataRegister<Timer16Bit, ReadWrite> orcbl;
+                DataRegister<Timer16Bit, ReadWrite> ocrbh;
+
                 template<int N> struct address;
             };
 
@@ -234,6 +283,11 @@ namespace lib::avr {
         struct ATMega328::Timer8Bit::address<0> {
             static constexpr uint8_t value = 0x44;
         };
+
+    template<>
+    struct ATMega328::Timer16Bit::address<0> {
+        static constexpr uint8_t value = 0x80;
+    };
 
         template<>
         struct ATMega328::ADConverter::address<0> {
