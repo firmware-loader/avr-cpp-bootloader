@@ -105,7 +105,7 @@ namespace lib::avr {
             };
 
             struct Timer16Bit {
-                static constexpr uint8_t count = 1;
+                static constexpr uint8_t count = 2;
 
                 using value_type = uint8_t;
                 enum class TCCRA : uint8_t {
@@ -117,16 +117,16 @@ namespace lib::avr {
                     wgm1 = (1 << WGM11)
                 };
                 ControlRegister<Timer16Bit, TCCRA> tccra;
+
                 enum class TCCRB : uint8_t {
-                    icnc = (1 << ICNC1),
-                    ices = (1 << ICES1),
-                    wgm3 = (1 << WGM13),
+                    icnc = (1 << FOC0A),
+                    ices = (1 << FOC0B),
                     wgm2 = (1 << WGM12),
+                    wgm3 = (1 << WGM13),
                     cs2 = (1 << CS12),
                     cs1 = (1 << CS11),
                     cs0 = (1 << CS10),
                 };
-
                 ControlRegister<Timer16Bit, TCCRB> tccrb;
 
                 enum class TCCRC : uint8_t {
@@ -284,10 +284,15 @@ namespace lib::avr {
             static constexpr uint8_t value = 0x44;
         };
 
-    template<>
-    struct ATMega328::Timer16Bit::address<0> {
-        static constexpr uint8_t value = 0x80;
-    };
+        template<>
+        struct ATMega328::Timer16Bit::address<0> {
+            static constexpr uint8_t value = 0x80;
+        };
+
+        template<>
+        struct ATMega328::Timer16Bit::address<1> {
+            static constexpr uint8_t value = 0x90;
+        };
 
         template<>
         struct ATMega328::ADConverter::address<0> {
