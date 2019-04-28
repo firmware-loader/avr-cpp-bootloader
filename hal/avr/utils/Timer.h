@@ -49,6 +49,9 @@ namespace lib::avr::timer {
         Max
     };
 
+    template<WaveformGeneratorModes mode, OCRUpdateMode updateMode, TimerOverflowFlagOn flagOn, TimerResolution resolution, TimerTop top>
+    struct WaveformGenerationMode;
+
     template<typename MicroController, typename MicroController::mem_width TimerChannel>
     class Timer {
     private:
@@ -60,7 +63,9 @@ namespace lib::avr::timer {
 
         template<WaveformGeneratorModes mode, OCRUpdateMode updateMode, TimerOverflowFlagOn flagOn, TimerResolution resolution, TimerTop top = TimerTop::Max>
         static constexpr void setWaveformGeneratorMode() {
-            if(mode == WaveformGeneratorModes::Normal && updateMode == OCRUpdateMode::Immediate &&
+            WaveformGenerationMode<mode, updateMode, flagOn, resolution, top> mode;
+        }
+            /*if(mode == WaveformGeneratorModes::Normal && updateMode == OCRUpdateMode::Immediate &&
                 flagOn == TimerOverflowFlagOn::Max && resolution == TimerResolution::SixteenBit) {
                 //Nothing (0, 0, 0)
             } else if(mode == WaveformGeneratorModes::Normal && updateMode == OCRUpdateMode::TopReached &&
@@ -72,7 +77,7 @@ namespace lib::avr::timer {
                 } else if(resolution == TimerResolution::TenBit) {
                     *timer()->tccra.add(tccra::wgm0, tccra::wgm1);
                 }
-            } else  if(mode == WaveformGeneratorModes::ClearCounterOnCompareMatch && updateMode == OCRUpdateMode::TopReached &&
+            } else if(mode == WaveformGeneratorModes::ClearCounterOnCompareMatch && updateMode == OCRUpdateMode::TopReached &&
                        flagOn == TimerOverflowFlagOn::Bottom && resolution == TimerResolution::SixteenBit) {
                 *timer()->tccrb.add(tccrb::wgm2);
             } else if(mode == WaveformGeneratorModes::FastPWM && updateMode == OCRUpdateMode::BottomReached &&
@@ -85,8 +90,8 @@ namespace lib::avr::timer {
                 } else if(resolution == TimerResolution::TenBit) {
                     *timer()->tccra.add(tccra::wgm0, tccra::wgm1);
                 }
-            }
-        }
+            }*/
+
 
         template<ClockConfig config>
         static constexpr void setClockConfig() {
@@ -117,6 +122,38 @@ namespace lib::avr::timer {
             }
         }
 
+    };
+
+    template<>
+    struct WaveformGenerationMode<WaveformGeneratorModes::Normal, OCRUpdateMode::Immediate, TimerOverflowFlagOn::Max, TimerResolution::SixteenBit, TimerTop::Max> {
+        static constexpr auto wgm0 = false;
+        static constexpr auto wgm1 = false;
+        static constexpr auto wgm2 = false;
+        static constexpr auto wgm3 = false;
+    };
+
+    template<>
+    struct WaveformGenerationMode<WaveformGeneratorModes::PWMPhaseCorrect, OCRUpdateMode::TopReached, TimerOverflowFlagOn::Bottom, TimerResolution::EightBit, TimerTop::Max> {
+        static constexpr auto wgm0 = true;
+        static constexpr auto wgm1 = false;
+        static constexpr auto wgm2 = false;
+        static constexpr auto wgm3 = false;
+    };
+
+    template<>
+    struct WaveformGenerationMode<WaveformGeneratorModes::PWMPhaseCorrect, OCRUpdateMode::TopReached, TimerOverflowFlagOn::Bottom, TimerResolution::NineBit, TimerTop::Max> {
+        static constexpr auto wgm0 = false;
+        static constexpr auto wgm1 = true;
+        static constexpr auto wgm2 = false;
+        static constexpr auto wgm3 = false;
+    };
+
+    template<>
+    struct WaveformGenerationMode<WaveformGeneratorModes::PWMPhaseCorrect, OCRUpdateMode::TopReached, TimerOverflowFlagOn::Bottom, TimerResolution::TenBit, TimerTop::Max> {
+        static constexpr auto wgm0 = true;
+        static constexpr auto wgm1 = true;
+        static constexpr auto wgm2 = false;
+        static constexpr auto wgm3 = false;
     };
 }
 
