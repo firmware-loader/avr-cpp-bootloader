@@ -7,6 +7,7 @@
 #include "hal/avr/mcus/mega328/Mega328.h"
 #include "hal/avr/pin/Control.h"
 #include "abstraction/uart/AbstractUart.h"
+#include "hal/avr/utils/Timer.h"
 
 
 using mcu = lib::avr::ATMega328;

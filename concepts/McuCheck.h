@@ -8,6 +8,10 @@ concept Microcontroller = requires(T a) {
     { std::hash<T>{}(a) } -> std::size_t;
 };
 
+template<typename T>
+concept ControlRegisterable = requires(T a) {
+    { std::hash<T>{}(a) } -> std::size_t;
+};
 
 
 
