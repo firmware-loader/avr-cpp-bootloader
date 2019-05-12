@@ -7,7 +7,8 @@
 template<typename MicroController>
 class SoftwareUart {
 public:
-    constexpr auto
+    constexpr auto preamble = 0x55;
+    constexpr auto blockstart = 0xCC;
 };
 
 

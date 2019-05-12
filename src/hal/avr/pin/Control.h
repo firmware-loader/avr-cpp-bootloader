@@ -75,6 +75,9 @@ namespace lib::Hal {
             static void off() {
                 Port::get() &= static_cast<uint8_t>(~mask);
             }
+            static auto get() {
+                return Port::read() & (1 << static_cast<uint8_t>(mask));
+            }
         };
 
         template<typename T>

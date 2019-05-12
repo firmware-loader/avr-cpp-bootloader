@@ -17,12 +17,16 @@ int main() {
     using namespace lib::software::literals;
     using uart = lib::software::Uart<mcu>;
 
-    pin::setDirection<lib::pins::Pin<mcu, 8>, pin::Direction::OUTPUT>();
+    pin::setDirection<pin::Pin<mcu, 8>, pin::Direction::OUTPUT>();
     uart::init<9600_baud>();
 
     while(true) {
-        pin::setPinState<lib::pins::Pin<mcu, 8>, pin::State::FLIP>();
-        uart::sendData("Hallo Welt!\n\r");
-        _delay_ms(500);
+        pin::flipPinState<pin::Pin<mcu, 8>>();
+        if(pin::readPinState<pin::Pin<mcu, 0>>() == pin::State::ON) {
+            uart::sendData("ON!\n\r");
+        } else {
+            uart::sendData("OFF!\n\r");
+        }
+        //_delay_ms(500);
     }
 }

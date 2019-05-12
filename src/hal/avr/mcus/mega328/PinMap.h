@@ -9,7 +9,7 @@
 #include "../../pin/Control.h"
 
 //Arduino Pinout
-namespace lib::pins {
+namespace pin {
     using mcu = lib::avr::ATMega328;
 
     using PortB = lib::Hal::Port<lib::avr::B, mcu>;

@@ -13,8 +13,7 @@ namespace pin {
 
     enum class State {
         ON,
-        OFF,
-        FLIP
+        OFF
     };
 
     template<typename Pin, Direction direction>
@@ -34,8 +33,22 @@ namespace pin {
             pin::on();
         } else if (direction == State::OFF) {
             pin::off();
-        } else if (direction == State::FLIP) {
-            pin::flip();
+        }
+    }
+
+    template<typename Pin>
+    static constexpr auto flipPinState() {
+        using pin = Pin::value;
+        pin::flip();
+    }
+
+    template<typename Pin>
+    static constexpr State readPinState() {
+        using pin = Pin::value;
+        if(pin::get() == 1) {
+            return State::ON;
+        } else {
+            return State::OFF;
         }
     }
 }
