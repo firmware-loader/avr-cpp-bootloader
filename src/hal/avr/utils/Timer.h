@@ -52,7 +52,7 @@ namespace lib::avr::timer {
     template<WaveformGeneratorModes mode, OCRUpdateMode updateMode, TimerOverflowFlagOn flagOn, TimerResolution resolution, TimerTop top>
     struct WaveformGenerationMode;
 
-    template<typename MicroController, typename MicroController::mem_width TimerChannel>
+    template<typename MicroController, MicroController::mem_width TimerChannel>
     class Timer {
     private:
         static constexpr auto timer = lib::avr::getAddress<typename MicroController::Timer16Bit, TimerChannel>;

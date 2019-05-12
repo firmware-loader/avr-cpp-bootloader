@@ -6,7 +6,8 @@
 
 template<typename MicroController>
 class SoftwareUart {
-
+public:
+    constexpr auto
 };
 
 

@@ -9,12 +9,12 @@ SET(CMAKE_CXX_STANDARD 20)
 #============================================================================================
 PROJECT(Bootloader)		  		# <-- Prjektname
 
-SET(FILES main.cpp hal/avr/mcus/mega328/Mega328.h hal/avr/Register.h lib/type_traits.h abstraction/uart/AbstractUart.h concepts/McuCheck.h hal/avr/pin/Control.h hal/avr/utils/AvrUtils.h hal/avr/utils/Uart.h hal/MCUFamilies.h software/uart/SoftwareUart.h hal/avr/utils/Timer.h)		  	# <-- Quelldatei(en)
+SET(FILES main.cpp src/hal/avr/mcus/mega328/Mega328.h src/hal/avr/Register.h src/lib/type_traits.h src/abstraction/uart/AbstractUart.h src/concepts/McuCheck.h src/hal/avr/pin/Control.h src/hal/avr/utils/AvrUtils.h src/hal/avr/utils/Uart.h src/hal/MCUFamilies.h src/software/uart/SoftwareUart.h src/hal/avr/utils/Timer.h src/hal/avr/mcus/mega328/PinMap.h src/abstraction/pins/PinControl.h)		  	# <-- Quelldatei(en)
 
 SET(DEVICE atmega328p)			# <-- MCU
-SET(FREQ 1000000)			# <-- MCU-Frequenz
+SET(FREQ 12000000)			# <-- MCU-Frequenz
 
-SET(AVRBIN "/home/sebastian/avr-gcc/avr-gcc-8.3.0-x64-linux/bin/")		# <-- Toolchain
+SET(AVRBIN "/bin/gcc9/linux/bin/")		# <-- Toolchain
 SET(AVROBJCOPY avr-objcopy)		# <--     ""
 SET(AVRSIZE avr-size)			# <--     ""
 SET(AVRDUDE avrdude)			# <--     ""
@@ -40,7 +40,7 @@ SET(CMAKE_C_FLAGS  "-Os -mmcu=${DEVICE} ${ASM_FLAG} -DBOOT_BAUD_RATE=9600 -DF_CP
 SET(CMAKE_CXX_FLAGS "-Os -mmcu=${DEVICE} ${ASM_FLAG} -DBOOT_BAUD_RATE=9600 -DF_CPU=${FREQ}UL -Wl,--gc-sections -fconcepts -Wall -Wextra -fno-threadsafe-statics")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
-set(CMAKE_PREFIX_PATH  "/home/sebastian/avr-gcc/avr-gcc-8.3.0-x64-linux/")
+set(CMAKE_PREFIX_PATH  "/bin/gcc9/linux/")
 set(CMAKE_EXECUTABLE_SUFFIX ".elf")
 
 set_property(DIRECTORY PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
@@ -48,7 +48,7 @@ set_property(DIRECTORY PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
         "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.eep"
         )
 
-include_directories("/home/sebastian/avr-gcc/avr-gcc-8.3.0-x64-linux/bin//include")
+include_directories("/bin/gcc9/linux/bin/include")
 
 SET(SOURCE_FILES ${FILES})
 

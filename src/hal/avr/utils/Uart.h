@@ -31,7 +31,7 @@ namespace lib::avr::uart {
         Nine
     };
 
-    template<typename MicroController, typename MicroController::mem_width UartChannel>
+    template<typename MicroController, MicroController::mem_width UartChannel>
     class UartHal {
     private:
         static constexpr auto uart = lib::avr::getAddress<typename MicroController::Uart, UartChannel>;
