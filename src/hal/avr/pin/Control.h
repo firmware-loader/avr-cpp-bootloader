@@ -76,7 +76,7 @@ namespace lib::Hal {
                 Port::get() &= static_cast<uint8_t>(~mask);
             }
             static auto get() {
-                return Port::read() & (1 << static_cast<uint8_t>(mask));
+                return Port::read() & (mask);
             }
         };
 

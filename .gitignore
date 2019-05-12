@@ -165,3 +165,5 @@ bin/
 fullout\.txt
 
 create_tmp\.sh
+
+debug\.txt

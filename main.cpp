@@ -18,15 +18,19 @@ int main() {
     using uart = lib::software::Uart<mcu>;
 
     pin::setDirection<pin::Pin<mcu, 8>, pin::Direction::OUTPUT>();
+
+    pin::setDirection<pin::Pin<mcu, 6>, pin::Direction::INPUT>();
+    pin::setInputState<pin::Pin<mcu, 6>, pin::InputState::PULLUP>();
     uart::init<9600_baud>();
+    uart::sendData("GO!\n\r");
 
     while(true) {
-        pin::flipPinState<pin::Pin<mcu, 8>>();
-        if(pin::readPinState<pin::Pin<mcu, 0>>() == pin::State::ON) {
+        pin::flipOutputState<pin::Pin<mcu, 8>>();
+        if(pin::readPinState<pin::Pin<mcu, 6>>() == pin::State::ON) {
             uart::sendData("ON!\n\r");
         } else {
             uart::sendData("OFF!\n\r");
         }
-        //_delay_ms(500);
+        _delay_ms(500);
     }
 }

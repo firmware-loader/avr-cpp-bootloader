@@ -16,6 +16,11 @@ namespace pin {
         OFF
     };
 
+    enum class InputState {
+        PULLUP,
+        NO_PULLUP
+    };
+
     template<typename Pin, Direction direction>
     static constexpr auto setDirection() {
         using pin = Pin::value;
@@ -27,7 +32,7 @@ namespace pin {
     }
 
     template<typename Pin, State direction>
-    static constexpr auto setPinState() {
+    static constexpr auto setOutputState() {
         using pin = Pin::value;
         if constexpr (direction == State::ON) {
             pin::on();
@@ -36,8 +41,18 @@ namespace pin {
         }
     }
 
+    template<typename Pin, InputState direction>
+    static constexpr auto setInputState() {
+        using pin = Pin::value;
+        if constexpr (direction == InputState::PULLUP) {
+            pin::on();
+        } else if (direction == InputState::NO_PULLUP) {
+            pin::off();
+        }
+    }
+
     template<typename Pin>
-    static constexpr auto flipPinState() {
+    static constexpr auto flipOutputState() {
         using pin = Pin::value;
         pin::flip();
     }
@@ -45,7 +60,7 @@ namespace pin {
     template<typename Pin>
     static constexpr State readPinState() {
         using pin = Pin::value;
-        if(pin::get() == 1) {
+        if(pin::get() != 0) {
             return State::ON;
         } else {
             return State::OFF;
