@@ -22,11 +22,7 @@ int main() {
     softUart::init<0>();
 
     while(true) {
-        auto sync = softUart::checkSlot();
-        if(sync == Sync::SYNCED) {
-            uart::sendData("synced!");
-        } else if(sync == Sync::OFFSYNC) {
-            uart::sendData("off!");
-        }
+        softUart::waitForSync();
+        uart::sendData("synced!");
     }
 }

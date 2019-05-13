@@ -7,86 +7,66 @@
 #include <avr/io.h>
 #include "../../abstraction/pins/PinControl.h"
 
-enum class Sync {
-    SYNCING,
-    SYNCED,
-    OFFSYNC
-};
-
 template<typename mcu>
 class SoftwareUart {
 private:
     static constexpr auto preamble = 0x55;
     static constexpr auto blockstart = 0xCC;
-    static constexpr auto measurements = 2;
 
-    static int16_t timer[2];
-    static uint8_t measurement;
-    static bool started;
-    static bool waitForLow;
-    static bool ignoreNextLow;
+    static int16_t bitcellLength;
 
     static constexpr auto isHigh() {
         return pin::readPinState<pin::Pin<mcu, 0>>() == pin::State::ON;
     }
+
+    static constexpr auto waitbitcell() {
+        auto tmpCell = bitcellLength;
+
+    }
+
 public:
     template<auto pinNumber>
     static constexpr void init() {
-
         pin::setDirection<pin::Pin<mcu, pinNumber>, pin::Direction::INPUT>();
         pin::setInputState<pin::Pin<mcu, pinNumber>, pin::InputState::PULLUP>();
+        waitForSync();
     }
 
-    static constexpr auto checkSlot() {
-        auto high = isHigh();
 
-        if(high && !started) {
-            started = true;
-            waitForLow = true;
-        }
+    static constexpr auto waitForSync() {
+        int16_t counter = 0;            //add on first low, subtract on 2nd low
 
-        if(!high && started && !ignoreNextLow) {
-            waitForLow = false;
-            timer[measurement]++;
-        }
+        do {
+            while(!isHigh()){}          //skip first low
+            while (isHigh()) {}         //and first high
 
-        if(!high && ignoreNextLow) {
-            started = false;
-            ignoreNextLow = false;
-        }
+            while (!isHigh()) {         //measure first low time
+                counter++;              //add to counter
+            }
+            while (isHigh()) {}         //wait for 2nd low
+            while (!isHigh()) {         //measure first low time
+                counter--;              //subtract from counter
+            }
+        } while(counter < 0);           //repeat until in sync
+        bitcellLength =  counter;       //return 1 bitcell
+    }
 
-        if(high && started && !waitForLow) {
-            started = false;
-            if(measurement + 1 < measurements) {
-                measurement++;
-            } else {
-                waitForLow = false;
-                measurement = 0;
+    static constexpr auto ReceiveByte() {
+        uint8_t buffer = 0;
+        //skip first high
+        //while(!isHigh()){}
 
-                if(timer[0] - timer[1] < 0) {
-                    ignoreNextLow = true;
-                    return Sync::OFFSYNC;
-                } else {
-                    return Sync::SYNCED;
-                }
+        //8-N-1 Bitcounter
+        for(uint8_t i = 0; i < 9; i++) {
+            //wait for 1/2 Bitcell
+            // ???
+            buffer /= 2;                // right shift 0 to 7th bit
+            if(isHigh()) {              // if high
+                buffer |= (1 << 7);     // set 7th bit to 1
             }
         }
-        return Sync::SYNCING;
     }
 };
 
 template<typename mcu>
-int16_t SoftwareUart<mcu>::timer[2] = {0, 0};
-
-template<typename mcu>
-uint8_t SoftwareUart<mcu>::measurement = 0;
-
-template<typename mcu>
-bool SoftwareUart<mcu>::started = false;
-
-template<typename mcu>
-bool SoftwareUart<mcu>::waitForLow = false;
-
-template<typename mcu>
-bool SoftwareUart<mcu>::ignoreNextLow = false;
-
+int16_t SoftwareUart<mcu>::bitcellLength = 0;
