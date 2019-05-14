@@ -19,10 +19,16 @@ int main() {
     using softUart = SoftwareUart<mcu>;
 
     uart::init<9600_baud>();
-    softUart::init<0>();
+    uart::sendData("start!");
 
-    while(true) {
-        softUart::waitForSync();
-        uart::sendData("synced!");
-    }
+    softUart::init<0>();
+    softUart::ReceiveByte();
+    //softUart::waitForSync();
+
+    const char got = softUart::ReceiveByte();
+    uart::sendChar(got);
+
+    //while(true) {
+    //    uart::sendData("synced!");
+    //}
 }

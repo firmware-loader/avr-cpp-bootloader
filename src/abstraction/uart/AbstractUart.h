@@ -42,6 +42,14 @@ namespace lib::software {
                 uart::sendData(data);
             }
         }
+
+        constexpr static void sendChar(const char data) {
+            if constexpr (MicroController::family == MCUFamilies::AVR) {
+                namespace uartNS = lib::avr::uart;
+                using uart = uartNS::UartHal<MicroController, 0>;
+                uart::sendChar(data);
+            }
+        }
     };
 }
 
