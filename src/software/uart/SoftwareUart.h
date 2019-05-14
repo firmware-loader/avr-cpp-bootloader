@@ -60,11 +60,11 @@ public:
         uint8_t totalSyncSwitches = (sync == Sync::Syncing) ? 4 : 10; //4 high low switches / 8-N-1
         uint16_t counter = bitcellLength;
         uint16_t tmpCounter = 0;
-        uint16_t numElements = 0;
+        uint8_t num_low = 0;
 
-        while(isHigh()){}                   //startbit is always low
+        while (totalSyncSwitches != 0) {
+            uint16_t numElements = 0;
 
-        while(totalSyncSwitches != 0) {
             if (isHigh()) {
                 while (isHigh()) {
                     counter--;
@@ -75,7 +75,8 @@ public:
                         buffer |= 1u;
                     }
                 }
-            } else {
+            }
+            else {
                 while (!isHigh()) {
                     counter--;
                     if (counter == 0) {
@@ -85,27 +86,35 @@ public:
                         buffer |= 0u;
                     }
                 }
+                num_low++;
             }
 
-            if(tmpCounter > 0 && (buffer & 1u) == 0) {
+            if (tmpCounter > 0 && (buffer & 1u) == 0) {
                 tmpCounter -= numElements;
-            } else if((buffer & 1u) == 0){
+            }
+            else if ((buffer & 1u) == 0) {
                 tmpCounter += numElements;
             }
 
-            if(sync == Sync::Syncing) {
+            if (sync == Sync::Syncing) {
                 totalSyncSwitches--;
-            } else {
+            }
+            else {
                 totalSyncSwitches -= numElements;
             }
 
-            if(tmpCounter < 0 && sync == Sync::Syncing) {
-                while(isHigh()){}
-                while(!isHigh()){}     //repeat until in sync
-            } else if(sync == Sync::Syncing) {
+            if (tmpCounter < 0  && sync == Sync::Syncing) {
+                buffer = 0;
+                num_low = 0;
+                tmpCounter = 0;
+                totalSyncSwitches = 4;
+                while (!isHigh()) {}     //repeat until in sync
+            }
+            else if (sync == Sync::Syncing && num_low >= 2) {
                 bitcellLength = tmpCounter;
                 sync = Sync::Synced;
-            } else {
+            }
+            else {
                 if(sizeof(typename mcu::mem_width) <= 1) {  // 8 bit mcu
                     asm("nop");
                     asm("nop");
