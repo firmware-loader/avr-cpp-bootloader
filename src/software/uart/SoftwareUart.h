@@ -17,7 +17,6 @@ class SoftwareUart {
 private:
     static constexpr auto blockstart = 0xCC;
 
-    static int16_t bitcellLength;
     static Sync sync;
 
     static constexpr auto isHigh() {
@@ -27,6 +26,7 @@ private:
     }
 
 public:
+    static int16_t bitcellLength;
     static constexpr auto preamble = 0x55;
     template<auto pinNumber>
     static constexpr void init() {
@@ -36,23 +36,54 @@ public:
     }
 
 
-    static constexpr auto waitForSync() {
+    [[gnu::always_inline]] static inline auto nop() {
+        volatile uint8_t tmp = bitcellLength / 2;
+        volatile uint8_t tmp2 = tmp;
+        if(tmp-- > 0 ) { asm(""); }
+        if(tmp2-- > 0) { asm(""); }
+        tmp | (1u << 1u);
+    }
+
+    static unsigned long long waitForSync() {
         while(true) {
+            bitcellLength = 0;
             while(isHigh()){}           //skip first high
             while (!isHigh()) {         //measure first low time
                 bitcellLength++;        //add to counter
             }
             while (isHigh()) {}         //wait for 2nd low
-            while (!isHigh()) {         //measure first low time
+            while (!isHigh()) {         //measure first low time, takes 4 instructions on -Os
                 bitcellLength--;        //subtract from counter
             }
-            while(!isHigh()){}          //skip low
+            //while(!isHigh()){}        //skip low
             if(bitcellLength < 0) {
-                while(!isHigh()){}     //repeat until in sync
+                while(isHigh()){}
+                while(!isHigh()){}      //repeat until in sync
             } else {
                 break;                  //sync
             }
         }
+        return F_CPU / (bitcellLength * 14);    //where do these 10 instructions come from?
+    }
+
+    static auto ReceiveData() {
+        uint8_t buffer = 0;
+        uint8_t i = 0;
+        while(isHigh()){}                   // skip everything before start
+        for(; i < 9; i++) {                  // 8-N-1
+            volatile uint8_t tmp = bitcellLength / 2 ;
+            volatile uint8_t tmp2 = tmp;
+            buffer *= 2;                    // lshift
+            while(tmp-- > 0 ) { asm(""); }
+            if(isHigh()) {
+                tmp--;                                // keep same op count
+            } else {
+                buffer |= 1u;
+            }
+            while(tmp2-- > 0) { asm(""); }             // forward to end
+        }
+        while(!isHigh()){}                  // skip last low (stop bit)
+        return buffer;
     }
 
     static auto ReceiveByte() {
@@ -113,6 +144,7 @@ public:
             else if (sync == Sync::Syncing && num_low >= 2) {
                 bitcellLength = tmpCounter;
                 sync = Sync::Synced;
+                break;                                      //we are in sync now and can skip the last high
             }
             else {
                 if(sizeof(typename mcu::mem_width) <= 1) {  // 8 bit mcu
@@ -129,7 +161,7 @@ public:
 };
 
 template<typename mcu>
-int16_t SoftwareUart<mcu>::bitcellLength = 1;
+int16_t SoftwareUart<mcu>::bitcellLength = 0;
 
 
 template<typename mcu>
