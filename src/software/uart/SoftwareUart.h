@@ -37,11 +37,6 @@ public:
 
 
     [[gnu::always_inline]] static inline auto nop() {
-        volatile uint8_t tmp = bitcellLength / 2;
-        volatile uint8_t tmp2 = tmp;
-        if(tmp-- > 0 ) { asm(""); }
-        if(tmp2-- > 0) { asm(""); }
-        tmp | (1u << 1u);
     }
 
     static unsigned long long waitForSync() {
@@ -50,12 +45,13 @@ public:
             while(isHigh()){}           //skip first high
             while (!isHigh()) {         //measure first low time
                 bitcellLength++;        //add to counter
+                nop();
             }
             while (isHigh()) {}         //wait for 2nd low
             while (!isHigh()) {         //measure first low time, takes 4 instructions on -Os
                 bitcellLength--;        //subtract from counter
+                nop();
             }
-            //while(!isHigh()){}        //skip low
             if(bitcellLength < 0) {
                 while(isHigh()){}
                 while(!isHigh()){}      //repeat until in sync
@@ -63,7 +59,7 @@ public:
                 break;                  //sync
             }
         }
-        return F_CPU / (bitcellLength * 14);    //where do these 10 instructions come from?
+        return bitcellLength;/*F_CPU / (bitcellLength * 14)*/;    //where do these 10 instructions come from?
     }
 
     static auto ReceiveData() {

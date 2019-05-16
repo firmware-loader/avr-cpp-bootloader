@@ -5,7 +5,7 @@
 #pragma once
 
 #include "AvrUtils.h"
-namespace lib::avr::timer {
+namespace lib::avr::timer16bit {
     enum class TimerResolution : uint8_t {
         EightBit,
         NineBit,
@@ -53,7 +53,7 @@ namespace lib::avr::timer {
     struct WaveformGenerationMode;
 
     template<typename MicroController, MicroController::mem_width TimerChannel>
-    class Timer {
+    class Timer16 {
     private:
         static constexpr auto timer = lib::avr::getAddress<typename MicroController::Timer16Bit, TimerChannel>;
         using tccra = typename MicroController::Timer16Bit::tccra;
