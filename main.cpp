@@ -21,11 +21,14 @@ int main() {
     using softUart = SoftwareUart<mcu>;
     using timer = lib::software::AbstractTimer<mcu>;
 
-    uart::init<19200_baud>();
+    uart::init<38400_baud>();
     softUart::init<0>();
-    softUart::waitForSync();
 
-   // while(softUart::receiveData() != softUart::preamble) { }
+    do {
+        softUart::waitForSync();
+    } while(softUart::receiveData() != 0xCC);
+
+    while(softUart::receiveData() != softUart::preamble) { }
     while(true) {
         auto data = softUart::receiveData();
         uart::sendChar(data);

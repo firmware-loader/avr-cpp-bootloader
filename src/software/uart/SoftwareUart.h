@@ -41,14 +41,13 @@ public:
         //waitForSync();
     }
 
-
     static constexpr auto calculateTime(auto startValue, auto endValue) {
         return (startValue > endValue) ?
         (utils::numeric_limits<decltype(startValue)>::max() - startValue) + endValue
                                 : endValue - startValue;
     }
 
-    static unsigned long long waitForSync() {
+    static auto waitForSync() {
         while(true) {
             while(isHigh()){}           //skip first high
 
@@ -76,24 +75,21 @@ public:
                 break;                  //sync
             }
         }
-        return bitcellLength;    //where do these 10 instructions come from?
+        //return bitcellLength;    //where do these 10 instructions come from?
     }
 
     static auto receiveData() {
         uint8_t buffer = 0;
         uint8_t i = 0;                      // this is mandatory
         while(isHigh()){}                   // skip everything before start (this will keep the sync)
-        uint8_t tmp = bitcellLength / 2 ;
         for(; i < 9; i++) {                  // 8-N-1 (will overwrite start bit)
             auto startValue = timer::readValue();
             buffer /= 2;                    // lshift
-            while(calculateTime(startValue, timer::readValue()) < tmp ) {  }
             if(isHigh()) {
                 buffer |= (1u << 7);
             }
             while(calculateTime(startValue, timer::readValue()) < bitcellLength ) {  }
         }
-        //buffer = reverse(buffer);
         while(!isHigh()){}                  // skip last low (stop bit)
         return buffer;
     }
