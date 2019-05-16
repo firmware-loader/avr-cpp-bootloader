@@ -21,33 +21,13 @@ int main() {
     using softUart = SoftwareUart<mcu>;
     using timer = lib::software::AbstractTimer<mcu>;
 
-    uart::init<9600_baud>();
-    uart::sendData("start!");
-
+    uart::init<19200_baud>();
     softUart::init<0>();
-
-    /*while(true) {
-        auto baudrate = softUart::waitForSync();
-        char buffer [33];
-        itoa(baudrate, buffer, 10);
-        uart::sendData(buffer);
-        uart::sendChar('\n');
-    }*/
     softUart::waitForSync();
-    while(softUart::receiveData() != softUart::preamble) { }
+
+   // while(softUart::receiveData() != softUart::preamble) { }
     while(true) {
-        /*auto value = softUart::waitForSync();
-        char buffer[33];
-        itoa(value, buffer, 10);
-        uart::sendData(buffer);
-        uart::sendData("\n\r");
-        _delay_ms(100);*/
         auto data = softUart::receiveData();
         uart::sendChar(data);
-        //uart::sendData("\n\r");
     }
-
-    //while(true) {
-    //    uart::sendData("synced!");
-    //}
 }
