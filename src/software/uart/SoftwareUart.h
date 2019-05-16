@@ -8,6 +8,8 @@
 #include "../../abstraction/pins/PinControl.h"
 #include "../../abstraction/uart/AbstractTimer.h"
 #include "../../utils/custom_limits.h"
+#include "../../utils/TypeTraits.h"
+#include "../../concepts/TypeCheck.h"
 
 enum class Sync : uint8_t {
     Synced,
@@ -41,7 +43,8 @@ public:
         //waitForSync();
     }
 
-    static constexpr auto calculateTime(auto startValue, auto endValue) {
+    template<typename T> requires concepts::UnsignedType<T>
+    static constexpr auto calculateTime(T startValue, T endValue) {
         return (startValue > endValue) ?
         (utils::numeric_limits<decltype(startValue)>::max() - startValue) + endValue
                                 : endValue - startValue;
@@ -84,6 +87,8 @@ public:
         while(isHigh()){}                   // skip everything before start (this will keep the sync)
         for(; i < 9; i++) {                  // 8-N-1 (will overwrite start bit)
             auto startValue = timer::readValue();
+            //for(uint8_t j=0; j < 10; j++) { asm(""); }
+            _delay_us(10);                  // todo: replace this
             buffer /= 2;                    // lshift
             if(isHigh()) {
                 buffer |= (1u << 7);
