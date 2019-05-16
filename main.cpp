@@ -25,7 +25,6 @@ int main() {
     uart::sendData("start!");
 
     softUart::init<0>();
-    timer::init<250000_khz>();
 
     /*while(true) {
         auto baudrate = softUart::waitForSync();
@@ -34,6 +33,8 @@ int main() {
         uart::sendData(buffer);
         uart::sendChar('\n');
     }*/
+    softUart::waitForSync();
+    while(softUart::receiveData() != softUart::preamble) { }
     while(true) {
         /*auto value = softUart::waitForSync();
         char buffer[33];
@@ -41,10 +42,9 @@ int main() {
         uart::sendData(buffer);
         uart::sendData("\n\r");
         _delay_ms(100);*/
-        softUart::waitForSync();
         auto data = softUart::receiveData();
         uart::sendChar(data);
-        uart::sendData("\n\r");
+        //uart::sendData("\n\r");
     }
 
     //while(true) {
