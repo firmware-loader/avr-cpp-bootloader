@@ -6,6 +6,8 @@
 
 #include <avr/io.h>
 #include "../../abstraction/pins/PinControl.h"
+#include "../../abstraction/uart/AbstractTimer.h"
+#include "../../utils/custom_limits.h"
 
 enum class Sync : uint8_t {
     Synced,
@@ -15,6 +17,7 @@ enum class Sync : uint8_t {
 template<typename mcu>
 class SoftwareUart {
 private:
+    using timer = lib::software::AbstractTimer<mcu>;
     static constexpr auto blockstart = 0xCC;
 
     static Sync sync;
@@ -30,28 +33,42 @@ public:
     static constexpr auto preamble = 0x55;
     template<auto pinNumber>
     static constexpr void init() {
+        using namespace lib::software::literals;
+
+        timer::template init<250000_khz>();
         pin::setDirection<pin::Pin<mcu, pinNumber>, pin::Direction::INPUT>();
         pin::setInputState<pin::Pin<mcu, pinNumber>, pin::InputState::PULLUP>();
         //waitForSync();
     }
 
 
-    [[gnu::always_inline]] static inline auto nop() {
+    static inline auto calculateTime(auto startValue, auto endValue) {
+        return (startValue > endValue) ?
+        (utils::numeric_limits<decltype(startValue)>::max() - startValue) + endValue
+                                : endValue - startValue;
     }
 
     static unsigned long long waitForSync() {
         while(true) {
-            bitcellLength = 0;
             while(isHigh()){}           //skip first high
+
+            auto startValue = timer::readValue();
             while (!isHigh()) {         //measure first low time
-                bitcellLength++;        //add to counter
-                nop();
             }
+            auto endValue = timer::readValue();
+
+            //overflow protection
+            bitcellLength = calculateTime(startValue, endValue);
+
             while (isHigh()) {}         //wait for 2nd low
-            while (!isHigh()) {         //measure first low time, takes 4 instructions on -Os
-                bitcellLength--;        //subtract from counter
-                nop();
+
+            startValue = timer::readValue();
+            while (!isHigh()) {
             }
+            endValue = timer::readValue();
+            bitcellLength -= calculateTime(startValue, endValue);
+
+
             if(bitcellLength < 0) {
                 while(isHigh()){}
                 while(!isHigh()){}      //repeat until in sync
@@ -59,24 +76,22 @@ public:
                 break;                  //sync
             }
         }
-        return bitcellLength;/*F_CPU / (bitcellLength * 14)*/;    //where do these 10 instructions come from?
+        return bitcellLength;    //where do these 10 instructions come from?
     }
 
-    static auto ReceiveData() {
+    static auto receiveData() {
         uint8_t buffer = 0;
         uint8_t i = 0;
         while(isHigh()){}                   // skip everything before start
-        for(; i < 9; i++) {                  // 8-N-1
+        for(; i < 9; i++) {                  // 8-N-1 (will overwrite start bit)
+            auto startValue = timer::readValue();
             volatile uint8_t tmp = bitcellLength / 2 ;
-            volatile uint8_t tmp2 = tmp;
             buffer *= 2;                    // lshift
-            while(tmp-- > 0 ) { asm(""); }
-            if(isHigh()) {
-                tmp--;                                // keep same op count
-            } else {
-                buffer |= 1u;
+            while(calculateTime(startValue, timer::readValue()) < tmp ) {  }
+            if(!isHigh()) {
+                buffer |= 1u;                // keep same op count
             }
-            while(tmp2-- > 0) { asm(""); }             // forward to end
+            while(calculateTime(startValue, timer::readValue()) < bitcellLength ) {  }
         }
         while(!isHigh()){}                  // skip last low (stop bit)
         return buffer;

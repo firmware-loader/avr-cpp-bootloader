@@ -39,7 +39,6 @@ namespace lib::software {
         constexpr static void init() {
             if constexpr (MicroController::family == MCUFamilies::AVR) {
                 namespace timerNS = lib::avr::timer8bit;
-                using timer = timerNS::Timer8<MicroController, 0>;
                 constexpr auto div = F_CPU / speed;
                 if constexpr(div < 4) {
                     avrInit<timerNS::ClockConfig::NoPrescaler>();

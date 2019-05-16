@@ -21,7 +21,7 @@ int main() {
     using softUart = SoftwareUart<mcu>;
     using timer = lib::software::AbstractTimer<mcu>;
 
-    uart::init<38400_baud>();
+    uart::init<9600_baud>();
     uart::sendData("start!");
 
     softUart::init<0>();
@@ -35,12 +35,16 @@ int main() {
         uart::sendChar('\n');
     }*/
     while(true) {
-        auto value = timer::readValue();
+        /*auto value = softUart::waitForSync();
         char buffer[33];
         itoa(value, buffer, 10);
         uart::sendData(buffer);
         uart::sendData("\n\r");
-        _delay_ms(100);
+        _delay_ms(100);*/
+        softUart::waitForSync();
+        auto data = softUart::receiveData();
+        uart::sendChar(data);
+        uart::sendData("\n\r");
     }
 
     //while(true) {
