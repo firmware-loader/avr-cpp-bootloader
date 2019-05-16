@@ -12,6 +12,7 @@ namespace lib::software {
     public:
         constexpr Baud(unsigned long long baudrate) : mBaudrate{baudrate}{ }
         constexpr operator unsigned long() const { return static_cast<unsigned long>(mBaudrate); }
+        [[nodiscard]] constexpr auto baud() const -> unsigned long long { return mBaudrate; };
     private:
         unsigned long long mBaudrate;
     };
@@ -26,7 +27,7 @@ namespace lib::software {
     template<typename MicroController>
     class Uart {
     public:
-        template<unsigned long baudrate>
+        template<unsigned long long baudrate>
         constexpr static void init() {
             if constexpr (MicroController::family == MCUFamilies::AVR) {
                 namespace uartNS = lib::avr::uart;

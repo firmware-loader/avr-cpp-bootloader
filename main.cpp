@@ -25,7 +25,7 @@ int main() {
     uart::sendData("start!");
 
     softUart::init<0>();
-    timer::init<123>();
+    timer::init<250000_khz>();
 
     /*while(true) {
         auto baudrate = softUart::waitForSync();
