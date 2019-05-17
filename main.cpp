@@ -21,11 +21,6 @@ int main() {
 
     uart::init<19200_baud>();
     softUart::init<0>();
-
-    /*do {
-        softUart::waitForSync();
-    } while(softUart::receiveData() != 0xCC);*/
-    softUart::waitForSync();
     while(softUart::receiveData() != softUart::preamble) {}
 
     while(true) {

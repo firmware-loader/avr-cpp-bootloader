@@ -40,16 +40,14 @@ public:
         timer::template init<250000_khz>();
         pin::setDirection<pin::Pin<mcu, pinNumber>, pin::Direction::INPUT>();
         pin::setInputState<pin::Pin<mcu, pinNumber>, pin::InputState::PULLUP>();
-        //waitForSync();
+
+        waitForSync();
     }
 
     template<typename T> requires concepts::UnsignedType<T>
     static constexpr T calculateTime(T startValue, T endValue) {
-        /*return (startValue > endValue) ?
-        (utils::numeric_limits<decltype(startValue)>::max() - startValue) + endValue
-                                : endValue - startValue;*/
         // unsigned integer wrap around trick
-        return  (utils::numeric_limits<decltype(startValue)>::max() - startValue) + endValue + 1;
+        return endValue - startValue;
     }
 
     static auto waitForSync() {
@@ -84,7 +82,7 @@ public:
 
     static auto receiveData() {
         uint8_t buffer = 0;
-        uint8_t i = 0;                      // this is mandatory
+        uint8_t i = 0;                      // this position is mandatory
         while(isHigh()){}                   // skip everything before start (this will keep the sync)
         for(; i < 9; i++) {                  // 8-N-1 (will overwrite start bit)
             auto startValue = timer::readValue();
