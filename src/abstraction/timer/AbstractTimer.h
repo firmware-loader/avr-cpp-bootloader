@@ -46,6 +46,13 @@ namespace lib::software {
 
                 return timer::readValue();
             }
+
+            [[nodiscard]] static constexpr auto timerBitCount() {
+                namespace timerNS = lib::avr::timer8bit;
+                using timer = timerNS::Timer8<MicroController, 0>;
+
+                return timer::bitCount();
+            }
         };
     }
 
@@ -77,6 +84,10 @@ namespace lib::software {
 
         [[nodiscard]] static constexpr auto readValue() {
                 return mcuDetail::readValue();
+        }
+
+        [[nodiscard]] static constexpr auto timerBitCount() {
+            return mcuDetail::timerBitCount();
         }
     };
 }

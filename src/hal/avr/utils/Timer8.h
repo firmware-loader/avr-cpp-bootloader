@@ -112,6 +112,10 @@ namespace lib::avr::timer8bit {
         [[nodiscard]] static constexpr auto readValue() -> uint8_t {
             return *timer()->tcnt;
         }
+
+        [[nodiscard]] static constexpr auto bitCount() -> uint8_t {
+            return 8;
+        }
     };
 
     template<>

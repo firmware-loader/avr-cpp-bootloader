@@ -46,11 +46,13 @@ public:
 
     template<typename T> requires concepts::UnsignedType<T>
     static constexpr T calculateTime(T startValue, T endValue) {
-        //TODO: what happens with a e.g. 24Bit timer?
-        // -> use a bitmask or some other trick?
-
-        // value needs to be unsigned to also work for wrapped around differences
-        return endValue - startValue;
+        if constexpr(timer::timerBitCount() == sizeof(T) * 8) {
+            // value needs to be unsigned to also work for wrapped around differences
+            return endValue - startValue;
+        } else {
+            constexpr auto value = (1 << (timer::timerBitCount() + 1));
+            return  (endValue - startValue) & (value - 1);
+        }
     }
 
     static auto waitForSync() {
