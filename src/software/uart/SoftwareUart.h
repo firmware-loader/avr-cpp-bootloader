@@ -44,10 +44,12 @@ public:
     }
 
     template<typename T> requires concepts::UnsignedType<T>
-    static constexpr auto calculateTime(T startValue, T endValue) {
-        return (startValue > endValue) ?
+    static constexpr T calculateTime(T startValue, T endValue) {
+        /*return (startValue > endValue) ?
         (utils::numeric_limits<decltype(startValue)>::max() - startValue) + endValue
-                                : endValue - startValue;
+                                : endValue - startValue;*/
+        // unsigned integer wrap around trick
+        return  (utils::numeric_limits<decltype(startValue)>::max() - startValue) + endValue + 1;
     }
 
     static auto waitForSync() {
@@ -78,7 +80,6 @@ public:
                 break;                  //sync
             }
         }
-        //return bitcellLength;    //where do these 10 instructions come from?
     }
 
     static auto receiveData() {
@@ -87,7 +88,6 @@ public:
         while(isHigh()){}                   // skip everything before start (this will keep the sync)
         for(; i < 9; i++) {                  // 8-N-1 (will overwrite start bit)
             auto startValue = timer::readValue();
-            //for(uint8_t j=0; j < 10; j++) { asm(""); }
             _delay_us(10);                  // todo: replace this
             buffer /= 2;                    // lshift
             if(isHigh()) {
