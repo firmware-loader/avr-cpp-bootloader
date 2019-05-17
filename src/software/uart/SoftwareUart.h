@@ -6,7 +6,7 @@
 
 #include <avr/io.h>
 #include "../../abstraction/pins/PinControl.h"
-#include "../../abstraction/uart/AbstractTimer.h"
+#include "../../abstraction/timer/AbstractTimer.h"
 #include "../../utils/custom_limits.h"
 #include "../../utils/TypeTraits.h"
 #include "../../concepts/TypeCheck.h"
@@ -46,7 +46,10 @@ public:
 
     template<typename T> requires concepts::UnsignedType<T>
     static constexpr T calculateTime(T startValue, T endValue) {
-        // unsigned integer wrap around trick
+        //TODO: what happens with a e.g. 24Bit timer?
+        // -> use a bitmask or some other trick?
+
+        // value needs to be unsigned to also work for wrapped around differences
         return endValue - startValue;
     }
 
@@ -58,8 +61,6 @@ public:
             while (!isHigh()) {         //measure first low time
             }
             auto endValue = timer::readValue();
-
-            //overflow protection
             bitcellLength = calculateTime(startValue, endValue);
 
             while (isHigh()) {}         //wait for 2nd low

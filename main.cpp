@@ -5,11 +5,8 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include "src/hal/avr/mcus/mega328/Mega328.h"
-#include "src/hal/avr/pin/Control.h"
 #include "src/abstraction/uart/AbstractUart.h"
-#include "src/abstraction/pins/PinControl.h"
 #include "src/software/uart/SoftwareUart.h"
-#include "src/abstraction/uart/AbstractTimer.h"
 
 
 using mcu = lib::avr::ATMega328;
