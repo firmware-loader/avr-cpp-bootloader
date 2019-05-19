@@ -9,7 +9,7 @@ SET(CMAKE_CXX_STANDARD 20)
 #============================================================================================
 PROJECT(Bootloader)		  		# <-- Prjektname
 
-SET(FILES main.cpp src/hal/avr/mcus/mega328/Mega328.h src/hal/avr/Register.h src/lib/type_traits.h src/abstraction/uart/AbstractUart.h src/concepts/McuCheck.h src/hal/avr/pin/Control.h src/hal/avr/utils/AvrUtils.h src/hal/avr/utils/Uart.h src/hal/MCUFamilies.h src/software/uart/SoftwareUart.h src/hal/avr/utils/Timer16.h src/hal/avr/mcus/mega328/PinMap.h src/abstraction/pins/PinControl.h src/hal/avr/utils/Timer8.h src/abstraction/timer/AbstractTimer.h src/utils/custom_limits.h src/utils/TypeTraits.h src/concepts/TypeCheck.h src/hal/avr/utils/bootloader/mega/Boot.h)		  	# <-- Quelldatei(en)
+SET(FILES main.cpp src/hal/avr/mcus/mega328/Mega328.h src/hal/Register.h src/lib/type_traits.h src/abstraction/uart/AbstractUart.h src/concepts/McuCheck.h src/hal/avr/pin/Control.h src/hal/avr/utils/AvrUtils.h src/hal/avr/utils/Uart.h src/hal/MCUFamilies.h src/software/uart/SoftwareUart.h src/hal/avr/utils/Timer16.h src/hal/avr/mcus/mega328/PinMap.h src/abstraction/pins/PinControl.h src/hal/avr/utils/Timer8.h src/abstraction/timer/AbstractTimer.h src/utils/custom_limits.h src/utils/TypeTraits.h src/concepts/TypeCheck.h src/hal/avr/utils/bootloader/mega/Boot.h src/hal/msp/mcus/msp432/Msp432.h)		  	# <-- Quelldatei(en)
 
 SET(DEVICE atmega328p)			# <-- MCU
 SET(FREQ 16000000)			# <-- MCU-Frequenz
@@ -23,11 +23,11 @@ SET(PROGRAMMER usbasp)		# <-- Programmertype
 SET(PORT usb)		         	# <-- USB bzw. Schnittstelle z.B. /dev/cu.usbserial....
 # SET(BAUD 57600)	        	# <-- Übertragungsrate
 
-SET(EEPROM NO)	     	        	# <-- soll eine x.eep Datei erstellt werden?
+SET(EEPROM NO)	     	        # <-- soll eine x.eep Datei erstellt werden?
 SET(FLASH NO)		        	# <-- soll Geflasht werden?
 SET(ASM NO)
 
-SET(BOOTPOSITION 0x7C00)
+SET(BOOTPOSITION 0x7800)        # 1024 Words (2048kB)
 
 #============================================================================================
 

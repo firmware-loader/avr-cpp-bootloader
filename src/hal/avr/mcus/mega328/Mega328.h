@@ -21,11 +21,13 @@
 # include <avr/io.h>
 
 #include "../../utils/AvrUtils.h"
-#include "../../Register.h"
+#include "../../../Register.h"
 #include "../../../../lib/type_traits.h"
 #include "../../../MCUFamilies.h"
 
 namespace lib::avr {
+        using namespace lib::mcu;
+
         struct ATMega328 final
         {
             static constexpr MCUFamilies family = MCUFamilies::AVR;

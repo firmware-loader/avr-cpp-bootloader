@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <avr/io.h>
+
 #include "../../abstraction/pins/PinControl.h"
 #include "../../abstraction/timer/AbstractTimer.h"
 #include "../../utils/custom_limits.h"
@@ -50,8 +50,8 @@ public:
             // value needs to be unsigned to also work for wrapped around differences
             return endValue - startValue;
         } else {
-            constexpr auto value = (1 << (timer::timerBitCount() + 1));
-            return  (endValue - startValue) & (value - 1);
+            constexpr auto mask = (1 << timer::timerBitCount()) - 1;
+            return  (endValue - startValue) & mask;
         }
     }
 

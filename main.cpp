@@ -7,6 +7,7 @@
 #include "src/hal/avr/mcus/mega328/Mega328.h"
 #include "src/abstraction/uart/AbstractUart.h"
 #include "src/software/uart/SoftwareUart.h"
+#include "src/hal/avr/utils/bootloader/mega/Boot.h"
 
 
 using mcu = lib::avr::ATMega328;

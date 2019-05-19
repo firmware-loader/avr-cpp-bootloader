@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../../lib/type_traits.h"
+#include "../lib/type_traits.h"
 
 namespace lib {
-    namespace avr {
+    namespace mcu {
         struct ReadWrite {};
         struct ReadOnly {};
         struct UnUsed {};

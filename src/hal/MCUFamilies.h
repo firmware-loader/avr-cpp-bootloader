@@ -6,6 +6,7 @@
 
 enum class MCUFamilies {
     AVR,
-    STM32
+    STM32,
+    MSP
 };
 
