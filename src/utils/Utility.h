@@ -14,8 +14,8 @@ namespace utils {
 
     namespace math {
         template<typename T>
-        static constexpr long double floor(T value) {
-            return (long double) value;
+        static constexpr long long floor(T value) {
+            return (long long) value;
         }
     }
 }
