@@ -7,6 +7,8 @@
 #include "src/hal/avr/mcus/mega328/Mega328.h"
 #include "src/abstraction/uart/AbstractUart.h"
 #include "src/software/uart/SoftwareUart.h"
+#include "src/software/uart/TimerSoftwareUart.h"
+#include "src/software/uart/AssemblerSoftwareUart.h"
 
 
 using mcu = lib::avr::ATMega328;
@@ -14,7 +16,7 @@ using mcu = lib::avr::ATMega328;
 int main() {
     using namespace lib::software::literals;
     using uart = lib::software::Uart<mcu>;
-    using softUart = SoftwareUart<mcu>;
+    using softUart = SoftwareUart<mcu, SoftUartMethod::Timer>;
 
     uart::init<19200_baud>();
     softUart::init<0, 9600, 31000>();
