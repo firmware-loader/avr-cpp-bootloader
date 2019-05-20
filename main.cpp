@@ -17,7 +17,7 @@ int main() {
     using softUart = SoftwareUart<mcu>;
 
     uart::init<19200_baud>();
-    softUart::init<0>();
+    softUart::init<0, 9600, 31000>();
     while(softUart::receiveData() != softUart::preamble) {}
 
     while(true) {

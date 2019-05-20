@@ -9,12 +9,32 @@
 
 namespace lib::software {
 
+    class KiloHertz;
+
     namespace {
         template<typename MicroController, MCUFamilies family>
         struct MCUDetail;
 
         template<typename MicroController>
         struct MCUDetail<MicroController, MCUFamilies::AVR> {
+        private:
+            template<unsigned long long speed>
+            constexpr static auto getClockDiv() {
+                namespace timerNS = lib::avr::timer8bit;
+                constexpr auto div = F_CPU / speed;
+                if constexpr(div < 4) {
+                    return timerNS::ClockConfig::NoPrescaler;
+                } else if(div >= 4 && div < 32) {
+                    return timerNS::ClockConfig::Div8;
+                } else if(div >= 32 && div < 128) {
+                    return timerNS::ClockConfig::Div64;
+                } else if(div >= 128 && div < 512) {
+                    return timerNS::ClockConfig::Div256;
+                } else {
+                    return timerNS::ClockConfig::Div1024;
+                }
+            }
+        public:
             template<auto config>
             static constexpr void avrInit() {
                 namespace timerNS = lib::avr::timer8bit;
@@ -24,18 +44,32 @@ namespace lib::software {
 
             template<unsigned long long speed>
             constexpr static void init() {
-                namespace timerNS = lib::avr::timer8bit;
-                constexpr auto div = F_CPU / speed;
-                if constexpr(div < 4) {
-                    avrInit<timerNS::ClockConfig::NoPrescaler>();
-                } else if(div >= 4 && div < 32) {
-                    avrInit<timerNS::ClockConfig::Div8>();
-                } else if(div >= 32 && div < 128) {
-                    avrInit<timerNS::ClockConfig::Div64>();
-                } else if(div >= 128 && div < 512) {
-                    avrInit<timerNS::ClockConfig::Div256>();
-                } else {
-                    avrInit<timerNS::ClockConfig::Div1024>();
+                avrInit<getClockDiv<speed>()>();
+            }
+
+            template<unsigned long long speed>
+            constexpr static auto getRealClockValue() {
+                using clockConfig = lib::avr::timer8bit::ClockConfig;
+                constexpr clockConfig div = getClockDiv<speed>();
+
+                static_assert(div != clockConfig::STOP ||
+                              div != clockConfig::ExternalSourceOnRisingEdge ||
+                              div != clockConfig::ExternalSourceOnFallingEdge,
+                              "Invalid Clock Div Value!");
+
+                switch (div) {
+                    case clockConfig::NoPrescaler:
+                        return KiloHertz(F_CPU);
+                    case clockConfig::Div8:
+                        return KiloHertz(F_CPU / 8);
+                    case clockConfig::Div64:
+                        return KiloHertz(F_CPU / 64);
+                    case clockConfig::Div256:
+                        return KiloHertz(F_CPU / 256);
+                    case clockConfig::Div1024:
+                        return KiloHertz(F_CPU / 1024);
+                    default:
+                        return KiloHertz(F_CPU);
                 }
 
             }
@@ -78,8 +112,13 @@ namespace lib::software {
         using mcuDetail = MCUDetail<MicroController, MicroController::family>;
     public:
         template<unsigned long long speed>
-        constexpr static void init() {
-            mcuDetail::template init<speed>();
+        constexpr static auto init() {
+            return mcuDetail::template init<speed>();
+        }
+
+        template<unsigned long long speed>
+        [[nodiscard]] static constexpr auto getRealClockValue() {
+            return mcuDetail::template getRealClockValue<speed>();
         }
 
         [[nodiscard]] static constexpr auto readValue() {
@@ -89,6 +128,8 @@ namespace lib::software {
         [[nodiscard]] static constexpr auto timerBitCount() {
             return mcuDetail::timerBitCount();
         }
+
+
     };
 }
 

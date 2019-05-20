@@ -10,6 +10,7 @@
 #include "../../utils/custom_limits.h"
 #include "../../utils/TypeTraits.h"
 #include "../../concepts/TypeCheck.h"
+#include "../../utils/Utility.h"
 
 enum class Sync : uint8_t {
     Synced,
@@ -33,11 +34,26 @@ private:
 public:
     static int16_t bitcellLength;
     static constexpr auto preamble = 0x55;
-    template<auto pinNumber>
+    template<auto pinNumber, auto minBaud, auto maxBaud>
     static constexpr void init() {
         using namespace lib::software::literals;
+        constexpr auto timerClockSpeed = 250000_khz;
 
-        timer::template init<250000_khz>();
+        timer::template init<timerClockSpeed>();
+        constexpr auto realTimerValue = timer::template getRealClockValue<timerClockSpeed>();
+        constexpr long double timerOffset = (timerClockSpeed / (long double)realTimerValue);
+
+        static_assert(timerOffset <= 1.1 && timerOffset >= 0.9, "Timer Offset not withing acceptable error margin!");
+        static_assert(realTimerValue / minBaud <= utils::getMaxValueOfBitcount<timer::timerBitCount()>(),
+                "Timer will overflow at minimum baud rate!");
+        static_assert(realTimerValue / minBaud > 0, "Timer too slow for maximum baud rate!");
+        static_assert(minBaud <= maxBaud, "Minimum Baud has to be below or equal to maximum baud!");
+        static_assert((realTimerValue / (long double)minBaud) - utils::math::floor(realTimerValue / (long double)minBaud) <= 0.1,
+                "Minimum Baud not withing acceptable error margin!");
+        static_assert((realTimerValue / (long double)maxBaud) - utils::math::floor(realTimerValue / (long double)maxBaud) <= 0.1,
+                "Maximum Baud not withing acceptable error margin!");
+
+
         pin::setDirection<pin::Pin<mcu, pinNumber>, pin::Direction::INPUT>();
         pin::setInputState<pin::Pin<mcu, pinNumber>, pin::InputState::PULLUP>();
 
@@ -50,8 +66,7 @@ public:
             // value needs to be unsigned to also work for wrapped around differences
             return endValue - startValue;
         } else {
-            constexpr auto value = (1 << (timer::timerBitCount() + 1));
-            return  (endValue - startValue) & (value - 1);
+            return  (endValue - startValue) & (utils::getMaxValueOfBitcount<timer::timerBitCount()>());
         }
     }
 
