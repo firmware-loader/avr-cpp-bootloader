@@ -18,7 +18,10 @@ int main() {
     using namespace lib::software::literals;
     using uart = lib::software::Uart<mcu>;
     using softUart = lib::software::SoftwareUart<mcu, lib::software::SoftUartMethod::Timer>;
-    blink_test(PORTB, 4);
+    while(true) {
+        blink_test(PORTB, 4);
+        _delay_ms(500);
+    }
     uart::init<19200_baud>();
     softUart::init<0, 9600_baud, 19200_baud>();
     while(softUart::receiveData() != softUart::preamble) {}
