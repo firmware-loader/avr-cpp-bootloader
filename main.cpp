@@ -23,10 +23,9 @@ int main() {
     uart::init<19200_baud>();
     char buffer [33];
 
+    uart::sendData("abc");
     while(true) {
         counter = 0;
-        itoa (counter, buffer, 10);
-        uart::sendData(buffer);
         SyncReceiveDecryptChainDetectMilestone();
         itoa (counter, buffer, 10);
         uart::sendData(buffer);

@@ -21,30 +21,31 @@ SyncReceiveDecryptChainDetectMilestone:
 ;
 PreSyncAutobaud:
 psa00:
-                sbic RXPIN, RXBIT       ; wait out any first 1-state
+                sbis RXPIN, RXBIT       ; wait-out any first 0-state
                 rjmp psa00
 psa01:
                 clr bl                  ; clear
                 clr bh                  ; baudrate word
                 rcall TimeOutStopState  ; wait for startbit
 psa10:
-                adiw bl, 2              ; add 1-state
-                sbic RXPIN, RXBIT
+                adiw bl, 1              ; add 0-state
+                sbis RXPIN, RXBIT
                 rjmp psa10
 psa11:
                 rcall TimeOutStopState  ; wait for next startbit
 psa20:
-                sbiw bl, 2              ; subtract 1-state
-                sbic RXPIN, RXBIT       ; to get an error compensated value
+                sbiw bl, 1              ; subtract 0-state
+                sbis RXPIN, RXBIT       ; to get an error compensated value
                 rjmp psa20
 
-                brmi SyncReceiveDecryptChainDetectMilestone
+                ;brmi SyncReceiveDecryptChainDetectMilestone
                 sts (counter + 1), bh
                 sts (counter + 0), bl
                 ret
 TimeOutStopState:
 toss0:
-                wdr                     ; apply periodic WD Reset in outer loop
+                ;wdr                     ; apply periodic WD Reset in outer loop
 toss1:                                  ; consider normal/inverted RX-logic
-                sbic RXPIN, RXBIT       ; if RX=0 occurs (normal startbit)
+                sbis RXPIN, RXBIT       ; if RX=0 occurs (normal startbit)
                 ret
+                brne toss1
