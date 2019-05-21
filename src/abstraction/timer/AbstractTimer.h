@@ -9,7 +9,13 @@
 
 namespace lib::software {
 
-    class KiloHertz;
+    struct Hertz {
+        //    constexpr KiloHertz(unsigned long long kilohertz) : mKHz{kilohertz}{ }
+        explicit constexpr operator unsigned long long() const { return static_cast<unsigned long long>(mKHz); }
+        //    [[nodiscard]] constexpr auto khz() const -> unsigned long long { return mKHz; };
+        //private:
+        unsigned long long mKHz;
+    };
 
     namespace {
         template<typename MicroController, MCUFamilies family>
@@ -59,17 +65,17 @@ namespace lib::software {
 
                 switch (div) {
                     case clockConfig::NoPrescaler:
-                        return KiloHertz(F_CPU);
+                        return Hertz{F_CPU};
                     case clockConfig::Div8:
-                        return KiloHertz(F_CPU / 8);
+                        return Hertz{F_CPU / 8};
                     case clockConfig::Div64:
-                        return KiloHertz(F_CPU / 64);
+                        return Hertz{F_CPU / 64};
                     case clockConfig::Div256:
-                        return KiloHertz(F_CPU / 256);
+                        return Hertz{F_CPU / 256};
                     case clockConfig::Div1024:
-                        return KiloHertz(F_CPU / 1024);
+                        return Hertz{F_CPU / 1024};
                     default:
-                        return KiloHertz(F_CPU);
+                        return Hertz{F_CPU};
                 }
 
             }
@@ -90,19 +96,10 @@ namespace lib::software {
         };
     }
 
-    class KiloHertz {
-    public:
-        constexpr KiloHertz(unsigned long long kilohertz) : mKHz{kilohertz}{ }
-        constexpr operator unsigned long() const { return static_cast<unsigned long>(mKHz); }
-        [[nodiscard]] constexpr auto khz() const -> unsigned long long { return mKHz; };
-    private:
-        unsigned long long mKHz;
-    };
-
     namespace literals {
-        constexpr KiloHertz operator"" _khz ( unsigned long long khz )
+        constexpr Hertz operator"" _hz ( unsigned long long hz )
         {
-            return KiloHertz{khz};
+            return Hertz{hz};
         }
     }
 
@@ -111,14 +108,14 @@ namespace lib::software {
     private:
         using mcuDetail = MCUDetail<MicroController, MicroController::family>;
     public:
-        template<unsigned long long speed>
+        template<Hertz speed>
         constexpr static auto init() {
-            return mcuDetail::template init<speed>();
+            return mcuDetail::template init<static_cast<unsigned long long>(speed)>();
         }
 
-        template<unsigned long long speed>
+        template<Hertz speed>
         [[nodiscard]] static constexpr auto getRealClockValue() {
-            return mcuDetail::template getRealClockValue<speed>();
+            return mcuDetail::template getRealClockValue<static_cast<unsigned long long>(speed)>();
         }
 
         [[nodiscard]] static constexpr auto readValue() {

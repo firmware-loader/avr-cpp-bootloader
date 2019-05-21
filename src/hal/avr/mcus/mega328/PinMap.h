@@ -7,6 +7,7 @@
 #include "../../utils/AvrUtils.h"
 #include "Mega328.h"
 #include "../../pin/Control.h"
+#include "../../../concepts/Pin.h"
 
 //Arduino Pinout
 namespace pin {
@@ -22,11 +23,6 @@ namespace pin {
     using PinC0 = lib::Hal::Pin<PortC, 0>;
 
     using PinD0 = lib::Hal::Pin<PortD, 0>;
-
-//------- [ PINS ] ------
-
-    template<typename mcu, auto N>
-    struct Pin;
 
 //------- [ D ] ------
 

@@ -12,16 +12,18 @@
 #include "../../concepts/TypeCheck.h"
 #include "../../utils/Utility.h"
 
-enum class Sync : uint8_t {
-    Synced,
-    Syncing
-};
+namespace lib::software {
+    enum class Sync : uint8_t {
+        Synced,
+        Syncing
+    };
 
-enum class SoftUartMethod : uint8_t {
-    Timer,
-    Assembler
-};
+    enum class SoftUartMethod : uint8_t {
+        Timer,
+        Assembler
+    };
 
-template<typename mcu, SoftUartMethod method>
-class SoftwareUart;
+    template<typename mcu, SoftUartMethod method>
+    class SoftwareUart;
+}
 
