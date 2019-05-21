@@ -6,4 +6,4 @@
 
 
 extern "C" volatile int16_t counter;
-extern "C" void SyncReceiveDecryptChainDetectMilestone();
+extern "C" void waitForSyncASM();

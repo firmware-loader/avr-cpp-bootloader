@@ -26,7 +26,7 @@ int main() {
     uart::sendData("abc");
     while(true) {
         counter = 0;
-        SyncReceiveDecryptChainDetectMilestone();
+        waitForSyncASM();
         itoa (counter, buffer, 10);
         uart::sendData(buffer);
     }
