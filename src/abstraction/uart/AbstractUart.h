@@ -8,7 +8,6 @@
 #include "../../hal/avr/utils/Uart.h"
 #include "../../software/Literals.h"
 
-
 namespace lib::software {
 
     template<typename MicroController>

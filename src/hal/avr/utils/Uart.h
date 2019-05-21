@@ -129,7 +129,7 @@ namespace lib::avr::uart {
         static constexpr void sendData(const char* data) {
             auto i = 0;
             while(data[i] != '\0') {
-                sendChar(data[i++]);
+                sendChar(static_cast<unsigned char>(data[i++]));
             }
         }
 
