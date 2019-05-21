@@ -7,7 +7,8 @@
 
 #include <avr/io.h>
 
-extern "C" void blink_test(uint8_t pin, uint8_t number);
+extern "C" volatile uint8_t buffer;
+extern "C" void blink_test();
 
 
 

@@ -37,8 +37,7 @@ namespace lib::software {
         static constexpr auto preamble = 0x55;
 
         template<auto pinNumber, Baud minBaud, Baud maxBaud>
-        requires pin::isAbstractPin<pin::Pin<mcu, pinNumber>>
-
+            requires pin::isAbstractPin<pin::Pin<mcu, pinNumber>>
         static constexpr void init() {
             using namespace lib::software::literals;
             constexpr auto timerClockSpeed = 250000_hz;
