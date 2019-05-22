@@ -24,12 +24,13 @@ int main() {
     char buffer [33];
 
     uart::sendData("abc");
+    counter = 0;
     while(true) {
-        counter = 0;
         waitForSyncASM();
-        itoa (counter, buffer, 10);
-        uart::sendData(buffer);
-        uart::sendData("/");
+        receiveByte();
+        //itoa (counter, buffer, 10);
+        //uart::sendData(buffer);
+        //uart::sendData("/");
         uart::sendChar((unsigned char)receiveBuffer);
     }
 

@@ -43,6 +43,7 @@
 #define     RXBIT       0
 
 .global  waitForSyncASM
+.global  receiveByte
 
 .comm counter, 2
 .comm receiveBuffer, 1
@@ -76,8 +77,10 @@ waitForSyncASM:
 ;        sts counter,bl
 ;        ldi bh,0
 ;        ldi bl,0
-;        ret
+        ret
 receiveByte:
+;        clr tmp1
+;        clr tmp2
 .skipHigh2:
         sbic RXPIN,RXBIT
         rjmp .skipHigh2
@@ -86,8 +89,8 @@ receiveByte:
         movw xl, bl
         lsr xh
         ror xl
-        rcall WaitBitcell+1
-        ldi tmp2, 8
+        ;rcall WaitBitcell+1
+        ldi tmp2, 9
 rxb3:
         rcall WaitBitcell
         lsr tmp1
@@ -97,16 +100,17 @@ rxb3:
         brne rxb3
 ;        ldi r25,0
 ;        ldi r24,0
-;        ret
+        ret
 WaitBitcell:
-        movw xl, bl     ; load bitcell timer from bl:bh
+        movw xl, bl
 wbc0:
         sbiw xl, 4
         brcc wbc0
 wbcx:
         sts receiveBuffer,tmp1
-        sts counter+1,bh
-        sts counter,bl
-;        ldi bh,0
-;        ldi bl,0
+;        sts counter+1,bh
+;        sts counter,bl
+;        clr bh
+;        clr bl
+;        clr tmp1
         ret
