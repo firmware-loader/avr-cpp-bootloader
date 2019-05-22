@@ -20,7 +20,7 @@ namespace lib::software {
             detail::sync();
         }
     public:
-        static auto syncAndRecieveBytes(unsigned char* input, uint8_t elements) {
+        static auto syncAndReceiveBytes(unsigned char *input, uint8_t elements) {
             waitForSync();
             while(receiveData() != preamble) {}
             for(uint8_t i=0; i < elements; i++) {

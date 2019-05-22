@@ -26,7 +26,7 @@ int main() {
     while(true) {
         constexpr auto elements = 10;
         unsigned char buffer[elements];
-        softUart::syncAndRecieveBytes(buffer, elements);
+        softUart::syncAndReceiveBytes(buffer, elements);
         uart::sendChar(buffer[elements - 1]);
     }
 }

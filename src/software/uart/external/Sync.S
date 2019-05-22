@@ -1,5 +1,5 @@
 ;original code:
-;static auto waitForSync() {
+;static auto waitForSyncASM() {
 ;     auto tmp = 0;
 ;     while (true) {
 ;         tmp = 0;
