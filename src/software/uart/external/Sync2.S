@@ -1,3 +1,33 @@
+;original code:
+;static auto waitForSync() {
+;     auto tmp = 0;
+;     while (true) {
+;         tmp = 0;
+;         while (isHigh()) {}           //skip first high
+;
+;         while (!isHigh()) {         //measure first low time
+;             tmp++;
+;         }
+;         tmp++;
+;
+;         while (isHigh()) {}         //wait for 2nd low
+;
+;         while (!isHigh()) {
+;             tmp--;
+;         }
+;         tmp--;
+;
+;         if (tmp < 0) {
+;             while (isHigh()) {}
+;             while (!isHigh()) {}      //repeat until in sync
+;         } else {
+;             break;                  //sync
+;         }
+;     }
+;     counter = tmp;
+; }
+
+
 #include <avr/io.h>
 #define     bl       r24
 #define     bh       r25
@@ -13,36 +43,32 @@
 
 .comm counter, 2
 
+.L7:
+        sbic RXPIN,RXBIT
+        rjmp .L7
+.L8:
+        sbis RXPIN,RXBIT
+        rjmp .L8
+        rjmp .L2
 waitForSyncASM:
 .L2:
-        sbic RXPIN, RXBIT
+        sbic RXPIN,RXBIT
         rjmp .L2
         ldi r25,0
         ldi r24,0
-.L4:
-        sbic RXPIN, RXBIT
-        rjmp .L3
-        adiw r24,1
-        rjmp .L4
 .L3:
-        sbic RXPIN, RXBIT
+        adiw r24,1
+        sbis RXPIN,RXBIT
         rjmp .L3
-.L6:
-        sbic RXPIN, RXBIT
-        rjmp .L5
-        sbiw r24,1
-        rjmp .L6
+.L4:
+        sbic RXPIN,RXBIT
+        rjmp .L4
 .L5:
-        sbrs r25,7
-        rjmp .L7
-.L8:
-        sbic RXPIN, RXBIT
-        rjmp .L8
-.L9:
-        sbis RXPIN, RXBIT
-        rjmp .L9
-        rjmp .L2
-.L7:
+        sbiw r24,1
+        sbis RXPIN,RXBIT
+        rjmp .L5
+        brmi .L7
+.L6:
         sts counter+1,r25
         sts counter,r24
         ldi r25,0
