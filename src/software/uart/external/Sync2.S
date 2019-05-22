@@ -43,34 +43,33 @@
 
 .comm counter, 2
 
-.L7:
+.skipHigh:
         sbic RXPIN,RXBIT
-        rjmp .L7
-.L8:
+        rjmp .skipHigh
+.skipLow:
         sbis RXPIN,RXBIT
-        rjmp .L8
-        rjmp .L2
+        rjmp .skipLow
 waitForSyncASM:
+        clr bh
+        clr bl
 .L2:
         sbic RXPIN,RXBIT
         rjmp .L2
-        ldi r25,0
-        ldi r24,0
 .L3:
-        adiw r24,1
+        adiw bl,1
         sbis RXPIN,RXBIT
         rjmp .L3
 .L4:
         sbic RXPIN,RXBIT
         rjmp .L4
 .L5:
-        sbiw r24,1
+        sbiw bl,1
         sbis RXPIN,RXBIT
         rjmp .L5
-        brmi .L7
+        brmi .skipHigh
 .L6:
-        sts counter+1,r25
-        sts counter,r24
+        sts counter+1,bh
+        sts counter,bl
         ldi r25,0
         ldi r24,0
         ret
