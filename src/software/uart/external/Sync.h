@@ -6,4 +6,7 @@
 
 
 extern "C" volatile int16_t counter;
+extern "C" volatile uint8_t receiveBuffer;
+
 extern "C" void waitForSyncASM();
+extern "C" void receiveByte();

@@ -32,6 +32,9 @@
 #define     bl       r24
 #define     bh       r25
 
+#define     tmp1     r16
+#define     tmp2     r17
+
 #define     TIMEOUT     200
 
 #define     RXPORT      (PORTD - __SFR_OFFSET)
@@ -42,6 +45,7 @@
 .global  waitForSyncASM
 
 .comm counter, 2
+.comm receiveBuffer, 1
 
 .skipHigh:
         sbic RXPIN,RXBIT
@@ -56,20 +60,53 @@ waitForSyncASM:
         sbic RXPIN,RXBIT
         rjmp .L2
 .L3:
-        adiw bl,1
+        adiw bl,5
         sbis RXPIN,RXBIT
         rjmp .L3
 .L4:
         sbic RXPIN,RXBIT
         rjmp .L4
 .L5:
-        sbiw bl,1
+        sbiw bl,5
         sbis RXPIN,RXBIT
         rjmp .L5
         brmi .skipHigh
 .L6:
+;        sts counter+1,bh
+;        sts counter,bl
+;        ldi bh,0
+;        ldi bl,0
+;        ret
+receiveByte:
+.skipHigh2:
+        sbic RXPIN,RXBIT
+        rjmp .skipHigh2
+        ldi tmp2, lo8(8)
+.L9:
+        movw xl, bl
+        lsr xh
+        ror xl
+        rcall WaitBitcell+1
+        ldi tmp2, 8
+rxb3:
+        rcall WaitBitcell
+        lsr tmp1
+        sbic RXPIN, RXBIT
+        ori tmp1, 128
+        dec tmp2
+        brne rxb3
+;        ldi r25,0
+;        ldi r24,0
+;        ret
+WaitBitcell:
+        movw xl, bl     ; load bitcell timer from bl:bh
+wbc0:
+        sbiw xl, 4
+        brcc wbc0
+wbcx:
+        sts receiveBuffer,tmp1
         sts counter+1,bh
         sts counter,bl
-        ldi r25,0
-        ldi r24,0
+;        ldi bh,0
+;        ldi bl,0
         ret
