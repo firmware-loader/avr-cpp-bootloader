@@ -22,29 +22,9 @@ namespace lib::software {
         static auto receiveData();
 
         static auto waitForSync() {
-            //uint8_t *bh asm ("r24");
-            //uint8_t *bl asm ("r25");
             int16_t data;
 
-            //while (!isHigh()) {}
-            asm("sync:");
-            asm("clr %A0"
-            : "=r" (data));
-            asm("clr %B0"
-            : "=r" (data));
-            asm("psa01:");
-            asm("adiw %A0, 5"
-            : "=r" (data) );
-            asm("sbis %0, 0"
-            : "=r" (PINB));
-            asm("rjmp psa01");
-            asm("psa02:");
-            asm("sbiw %A0, 5"
-            : "=r" (data) );
-            asm("sbis %0, 0"
-            : "=r" (PINB));
-            asm("rjmp psa02");
-            asm("brmi sync");
+
             return data;
         }
 

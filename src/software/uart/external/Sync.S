@@ -32,8 +32,8 @@
 #define     bl       r24
 #define     bh       r25
 
-#define     tmp1     r16
-#define     tmp2     r17
+#define     tmp1     r22
+#define     tmp2     r23
 
 #define     TIMEOUT     200
 

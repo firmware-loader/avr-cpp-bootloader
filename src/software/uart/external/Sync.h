@@ -12,8 +12,11 @@ namespace {
     extern "C" void receiveByte();
 }
 
-static auto syncAndReciveByte() {
+static auto sync() {
     waitForSyncASM();
+}
+
+static auto getByte() {
     receiveByte();
 
     return receiveBuffer;
