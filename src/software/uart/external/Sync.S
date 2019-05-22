@@ -72,18 +72,10 @@ waitForSyncASM:
         sbis RXPIN,RXBIT
         rjmp .L5
         brmi .skipHigh
-.L6:
-;        sts counter+1,bh
-;        sts counter,bl
-;        ldi bh,0
-;        ldi bl,0
         ret
 receiveByte:
-;        clr tmp1
-;        clr tmp2
-.skipHigh2:
         sbic RXPIN,RXBIT
-        rjmp .skipHigh2
+        rjmp receiveByte
         ldi tmp2, lo8(8)
 .L9:
         movw xl, bl
@@ -97,8 +89,6 @@ rxb3:
         ori tmp1, 128
         dec tmp2
         brne rxb3
-;        ldi r25,0
-;        ldi r24,0
         ret
 WaitBitcell:
         movw xl, bl
@@ -107,9 +97,4 @@ wbc0:
         brcc wbc0
 wbcx:
         sts receiveBuffer,tmp1
-;        sts counter+1,bh
-;        sts counter,bl
-;        clr bh
-;        clr bl
-;        clr tmp1
         ret

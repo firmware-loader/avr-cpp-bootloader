@@ -5,27 +5,28 @@
 #pragma once
 
 #include "SoftwareUart.h"
+#include "external/Sync.h"
 
 namespace lib::software {
     template<typename mcu>
     class SoftwareUart<mcu, SoftUartMethod::Assembler> {
     private:
-        static int16_t bitcellLength;
-
-        static constexpr auto isHigh() {
-            //return pin::readPinState<pin::Pin<mcu, 0>>() == pin::State::ON;
-            using pin = pin::Pin<mcu, 0>::value;
-            return (pin::get() != 0);
+        static constexpr auto preamble = 0x55;
+        static auto receiveData() {
+            return detail::getByte();
         }
 
-    public:
-        static auto receiveData();
-
         static auto waitForSync() {
-            int16_t data;
-
-
-            return data;
+            detail::sync();
+        }
+    public:
+        static auto syncAndRecieveBytes(unsigned char* input, uint8_t elements) {
+            waitForSync();
+            while(receiveData() != preamble) {}
+            for(uint8_t i=0; i < elements; i++) {
+                input[i] = receiveData();
+            }
+            return input;
         }
 
         template<auto pinNumber, auto minBaud, auto maxBaud>
@@ -33,12 +34,7 @@ namespace lib::software {
             pin::setDirection<pin::Pin<mcu, pinNumber>, pin::Direction::INPUT>();
             pin::setInputState<pin::Pin<mcu, pinNumber>, pin::InputState::PULLUP>();
 
-            waitForSync();
+            //waitForSync();
         }
     };
-
-
-    template<typename mcu>
-    int16_t SoftwareUart<mcu, SoftUartMethod::Assembler>::bitcellLength = 0;
-
 }
