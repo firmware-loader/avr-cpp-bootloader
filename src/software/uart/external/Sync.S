@@ -89,7 +89,6 @@ receiveByte:
         movw xl, bl
         lsr xh
         ror xl
-        ;rcall WaitBitcell+1
         ldi tmp2, 9
 rxb3:
         rcall WaitBitcell

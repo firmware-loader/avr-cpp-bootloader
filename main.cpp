@@ -24,14 +24,8 @@ int main() {
     char buffer [33];
 
     uart::sendData("abc");
-    counter = 0;
     while(true) {
-        waitForSyncASM();
-        receiveByte();
-        //itoa (counter, buffer, 10);
-        //uart::sendData(buffer);
-        //uart::sendData("/");
-        uart::sendChar((unsigned char)receiveBuffer);
+        uart::sendChar((unsigned char)syncAndReciveByte());
     }
 
     softUart::init<0, 9600_baud, 19200_baud>();
