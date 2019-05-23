@@ -5,6 +5,7 @@
 #pragma once
 
 #include "SoftwareUart.h"
+volatile uint8_t receiveBuffer;
 
 namespace lib::software {
     template<typename mcu>
@@ -12,17 +13,16 @@ namespace lib::software {
     class SoftwareUart<mcu, SoftUartMethod::Assembler> {
     private:
         static constexpr auto preamble = 0x55;
-        static constexpr auto RXBIT = 1;
-        static constexpr auto RXPIN = 0x05;
+        static constexpr auto RXBIT = 0;
+        static constexpr auto RXPIN = 0x09;
         static auto receiveData() {
-            volatile uint8_t receiveBuffer;
             asm volatile(R"(
                 receiveByte:
                         sbic %1,%2
                         rjmp receiveByte
                         ldi r23, lo8(8)
-                .CL9:
-                        movw xl, r24
+                CL9:
+                        movw xl, r26
                         lsr xh
                         ror xl
                         ldi r23, 9
@@ -33,49 +33,48 @@ namespace lib::software {
                         ori r22, 128
                         dec r23
                         brne rxb3
-                        ret
+                        rjmp LEND
                 WaitBitcell:
-                        movw xl, r24
+                        movw xl, r26
                 wbc0:
                         sbiw xl, 4
                         brcc wbc0
                 wbcx:
                         sts %0,r22
                         ret
+                LEND:
             )"
             : "=m" (receiveBuffer)
             : "n" (RXPIN), "n" (RXBIT));
-            return receiveBuffer;
         }
 
         static auto waitForSync() {
             asm volatile(R"(
                 rjmp waitForSyncASM
-                .skipHigh:
+                skipHigh:
                     sbic %0,%1
-                    rjmp .skipHigh
-                .skipLow:
+                    rjmp skipHigh
+                skipLow:
                         sbis %0,%1
-                        rjmp .skipLow
+                        rjmp skipLow
                 waitForSyncASM:
-                        clr r25
-                        clr r24
-                .CL2:
+                        clr r27
+                        clr r26
+                CL2:
                         sbic %0,%1
-                        rjmp .CL2
-                .CL3:
-                        adiw r24,5
+                        rjmp CL2
+                CL3:
+                        adiw r26,5
                         sbis %0,%1
-                        rjmp .CL3
-                .CL4:
+                        rjmp CL3
+                CL4:
                         sbic %0,%1
-                        rjmp .CL4
-                .CL5:
-                        sbiw r24,5
+                        rjmp CL4
+                CL5:
+                        sbiw r26,5
                         sbis %0,%1
-                        rjmp .CL5
-                        brmi .skipHigh
-                        ret
+                        rjmp CL5
+                        brmi skipHigh
             )"
             :
             : "n" (RXPIN), "n" (RXBIT));
@@ -83,10 +82,10 @@ namespace lib::software {
     public:
         static auto syncAndReceiveBytes(unsigned char *input, uint8_t elements) {
             waitForSync();
-            while(receiveData() != preamble) {}
-            for(uint8_t i=0; i < elements; i++) {
-                input[i] = receiveData();
-            }
+            //while(receiveData() != preamble) {}
+            //for(uint8_t i=0; i < elements; i++) {
+                input[elements - 1] = receiveBuffer;
+            //}
             return input;
         }
 
