@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace lib::software::detail {
+/*namespace lib::software::detail {
     namespace {
         extern "C" volatile int16_t counter;
         extern "C" volatile uint8_t receiveBuffer;
@@ -22,4 +22,4 @@ namespace lib::software::detail {
 
         return receiveBuffer;
     }
-}
+}*/

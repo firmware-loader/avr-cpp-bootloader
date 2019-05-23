@@ -9,6 +9,7 @@
 
 namespace lib::software {
     template<typename mcu>
+    requires mcu::family == MCUFamilies::AVR
     class SoftwareUart<mcu, SoftUartMethod::Assembler> {
     private:
         static constexpr auto preamble = 0x55;

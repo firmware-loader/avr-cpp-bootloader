@@ -9,7 +9,7 @@
 #include "src/abstraction/uart/AbstractUart.h"
 #include "src/software/uart/SoftwareUart.h"
 #include "src/software/uart/TimerSoftwareUart.h"
-#include "src/software/uart/AssemblerSoftwareUart.h"
+#include "src/software/uart/InlineAssemblerSoftwareUart.h"
 #include "src/software/uart/external/Sync.h"
 
 
