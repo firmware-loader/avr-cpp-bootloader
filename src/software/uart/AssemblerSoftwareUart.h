@@ -22,11 +22,9 @@ namespace lib::software {
     public:
         static auto syncAndReceiveBytes(uint8_t* input, uint8_t elements) {
             waitForSync();
-           // while(receiveData() != preamble) {}
             for(uint8_t i=0; i < elements; i++) {
                 input[i] = receiveData();
             }
-            return receiveData();
         }
 
         template<auto pinNumber, auto minBaud, auto maxBaud>
