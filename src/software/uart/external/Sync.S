@@ -72,6 +72,11 @@ waitForSyncASM:
         sbis RXPIN,RXBIT
         rjmp .L5
         brmi .skipHigh
+wop0:
+        rcall receiveByte
+        lds tmp1, receiveBuffer
+        cpi tmp1, lo8(85)
+        brne wop0
         ret
 receiveByte:
         sbic RXPIN,RXBIT

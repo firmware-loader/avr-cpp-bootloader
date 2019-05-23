@@ -12,7 +12,7 @@ namespace lib::software {
     class SoftwareUart<mcu, SoftUartMethod::Assembler> {
     private:
         static constexpr auto preamble = 0x55;
-        static auto receiveData() {
+        static inline auto receiveData() {
             return detail::getByte();
         }
 
@@ -20,13 +20,13 @@ namespace lib::software {
             detail::sync();
         }
     public:
-        static auto syncAndReceiveBytes(unsigned char *input, uint8_t elements) {
+        static auto syncAndReceiveBytes(uint8_t* input, uint8_t elements) {
             waitForSync();
-            while(receiveData() != preamble) {}
+           // while(receiveData() != preamble) {}
             for(uint8_t i=0; i < elements; i++) {
                 input[i] = receiveData();
             }
-            return input;
+            return receiveData();
         }
 
         template<auto pinNumber, auto minBaud, auto maxBaud>
