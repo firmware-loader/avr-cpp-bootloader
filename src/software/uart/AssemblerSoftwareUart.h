@@ -8,8 +8,8 @@
 #include "external/Sync.h"
 
 namespace lib::software {
-    template<typename mcu>
-    class SoftwareUart<mcu, SoftUartMethod::Assembler> {
+    template<typename mcu, auto pinNumber>
+    class SoftwareUart<mcu, pinNumber, SoftUartMethod::Assembler> {
     private:
         static constexpr auto preamble = 0x55;
         static inline auto receiveData() {
@@ -27,7 +27,7 @@ namespace lib::software {
             }
         }
 
-        template<auto pinNumber, auto minBaud, auto maxBaud>
+        template<auto minBaud, auto maxBaud>
         static constexpr void init() {
             pin::setDirection<pin::Pin<mcu, pinNumber>, pin::Direction::INPUT>();
             pin::setInputState<pin::Pin<mcu, pinNumber>, pin::InputState::PULLUP>();

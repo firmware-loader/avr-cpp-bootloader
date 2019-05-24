@@ -42,63 +42,63 @@
 #define     RXDDR       (DDRD - __SFR_OFFSET)
 #define     RXBIT       0
 
-.global  waitForSyncASM
-.global  receiveByte
+.global  asm_uart_waitForSyncASM
+.global  asm_uart_receiveByte
 
-.comm receiveBuffer, 1
+.comm asm_uart_receiveBuffer, 1
 
-.skipHigh:
+asm_uart_skipHigh:
         sbic RXPIN,RXBIT
-        rjmp .skipHigh
-.skipLow:
+        rjmp asm_uart_skipHigh
+asm_uart_skipLow:
         sbis RXPIN,RXBIT
-        rjmp .skipLow
-waitForSyncASM:
+        rjmp asm_uart_skipLow
+asm_uart_waitForSyncASM:
         clr bh
         clr bl
-.L2:
+asm_uart_L2:
         sbic RXPIN,RXBIT
-        rjmp .L2
-.L3:
+        rjmp asm_uart_L2
+asm_uart_L3:
         adiw bl,5
         sbis RXPIN,RXBIT
-        rjmp .L3
-.L4:
+        rjmp asm_uart_L3
+asm_uart_L4:
         sbic RXPIN,RXBIT
-        rjmp .L4
-.L5:
+        rjmp asm_uart_L4
+asm_uart_L5:
         sbiw bl,5
         sbis RXPIN,RXBIT
-        rjmp .L5
-        brmi .skipHigh
-wop0:
-        rcall receiveByte
-        lds tmp1, receiveBuffer
+        rjmp asm_uart_L5
+        brmi asm_uart_skipHigh
+asm_uart_wop0:
+        rcall asm_uart_receiveByte
+        lds tmp1, asm_uart_receiveBuffer
         cpi tmp1, lo8(85)
-        brne wop0
+        brne asm_uart_wop0
         ret
-receiveByte:
+asm_uart_receiveByte:
         sbic RXPIN,RXBIT
-        rjmp receiveByte
+        rjmp asm_uart_receiveByte
 ;        ldi tmp2, lo8(8)
-.L9:
+asm_uart_L9:
         movw xl, bl
         lsr xh
         ror xl
         ldi tmp2, 9
-rxb3:
-        rcall WaitBitcell
+asm_uart_rxb3:
+        rcall asm_uart_WaitBitcell
         lsr tmp1
         sbic RXPIN, RXBIT
         ori tmp1, 128
         dec tmp2
-        brne rxb3
+        brne asm_uart_rxb3
         ret
-WaitBitcell:
+asm_uart_WaitBitcell:
         movw xl, bl
-wbc0:
+asm_uart_wbc0:
         sbiw xl, 4
-        brcc wbc0
-wbcx:
-        sts receiveBuffer,tmp1
+        brcc asm_uart_wbc0
+asm_uart_wbcx:
+        sts asm_uart_receiveBuffer,tmp1
         ret

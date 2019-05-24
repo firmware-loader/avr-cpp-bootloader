@@ -11,10 +11,12 @@ namespace lib::software {
     extern "C" {
         volatile uint8_t receiveBuffer;
     }
-    template<typename mcu>
-    class SoftwareUart<mcu, SoftUartMethod::Assembler> {
+    template<typename mcu, auto pinNumber>
+        requires mcu::family == MCUFamilies::AVR && pin::isAbstractPin<pin::Pin<mcu, pinNumber>>
+    class SoftwareUart<mcu, pinNumber, SoftUartMethod::InlineAssembler> {
     private:
         static constexpr auto RXBIT = 0;
+        //https://rn-wissen.de/wiki/index.php?title=Inline-Assembler_in_avr-gcc
         static auto receiveData() {
             asm volatile(R"(
                 receiveByte:
@@ -48,8 +50,6 @@ namespace lib::software {
             : "r20", "r21", "r24", "r25");
         }
 
-        //TODO: save bh / bhl externally (something like uint16_t) + %A[bh] / %B[bh], =w
-        //https://rn-wissen.de/wiki/index.php?title=Inline-Assembler_in_avr-gcc
         static auto waitForSync() {
             asm volatile(R"(
                 rjmp waitForSyncASM
@@ -98,7 +98,7 @@ namespace lib::software {
             return input;
         }
 
-        template<auto pinNumber, auto minBaud, auto maxBaud>
+        template<auto minBaud, auto maxBaud>
         static constexpr void init() {
             pin::setDirection<pin::Pin<mcu, pinNumber>, pin::Direction::INPUT>();
             pin::setInputState<pin::Pin<mcu, pinNumber>, pin::InputState::PULLUP>();

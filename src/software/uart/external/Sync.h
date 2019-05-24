@@ -7,19 +7,19 @@
 namespace lib::software::detail {
     namespace {
         //extern "C" volatile int16_t counter;
-        extern "C" volatile uint8_t receiveBuffer;
+        extern "C" volatile uint8_t asm_uart_receiveBuffer;
 
-        extern "C" void waitForSyncASM();
-        extern "C" void receiveByte();
+        extern "C" void asm_uart_waitForSyncASM();
+        extern "C" void asm_uart_receiveByte();
     }
 
-    static auto sync() {
-        waitForSyncASM();
+    auto sync() -> void {
+        asm_uart_waitForSyncASM();
     }
 
-    static auto getByte() {
-        receiveByte();
+    auto getByte() ->  uint8_t {
+        asm_uart_receiveByte();
 
-        return receiveBuffer;
+        return asm_uart_receiveBuffer;
     }
 }

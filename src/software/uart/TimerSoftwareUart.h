@@ -9,15 +9,15 @@
 #include "../Literals.h"
 
 namespace lib::software {
-    template<typename mcu>
-    class SoftwareUart<mcu, SoftUartMethod::Timer> {
+    template<typename mcu, auto pinNumber>
+        requires pin::isAbstractPin<pin::Pin<mcu, pinNumber>>
+    class SoftwareUart<mcu, pinNumber, SoftUartMethod::Timer> {
     private:
         static int16_t bitcellLength;
         using timer = AbstractTimer<mcu>;
         static constexpr auto blockstart = 0xCC;
 
         static constexpr auto isHigh() {
-            //return pin::readPinState<pin::Pin<mcu, 0>>() == pin::State::ON;
             using pin = pin::Pin<mcu, 0>::value;
             return (pin::get() != 0);
         }
@@ -36,8 +36,7 @@ namespace lib::software {
     public:
         static constexpr auto preamble = 0x55;
 
-        template<auto pinNumber, Baud minBaud, Baud maxBaud>
-            requires pin::isAbstractPin<pin::Pin<mcu, pinNumber>>
+        template<Baud minBaud, Baud maxBaud>
         static constexpr void init() {
             using namespace lib::software::literals;
             constexpr auto timerClockSpeed = 250000_hz;
@@ -114,8 +113,8 @@ namespace lib::software {
         }
     };
 
-    template<typename mcu>
-    int16_t SoftwareUart<mcu, SoftUartMethod::Timer>::bitcellLength = 0;
+    template<typename mcu, auto pinNumber>
+    int16_t SoftwareUart<mcu, pinNumber, SoftUartMethod::Timer>::bitcellLength = 0;
 }
 
 
