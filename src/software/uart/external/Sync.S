@@ -45,7 +45,6 @@
 .global  waitForSyncASM
 .global  receiveByte
 
-.comm counter, 2
 .comm receiveBuffer, 1
 
 .skipHigh:
@@ -81,7 +80,7 @@ wop0:
 receiveByte:
         sbic RXPIN,RXBIT
         rjmp receiveByte
-        ldi tmp2, lo8(8)
+;        ldi tmp2, lo8(8)
 .L9:
         movw xl, bl
         lsr xh

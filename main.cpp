@@ -9,7 +9,7 @@
 #include "src/abstraction/uart/AbstractUart.h"
 #include "src/software/uart/SoftwareUart.h"
 #include "src/software/uart/TimerSoftwareUart.h"
-#include "src/software/uart/AssemblerSoftwareUart.h"
+#include "src/software/uart/InlineAssemblerSoftwareUart.h"
 #include "src/software/uart/external/Sync.h"
 
 
@@ -24,7 +24,7 @@ int main() {
     softUart::init<0, 9600_baud, 19200_baud>();
 
     while(true) {
-        constexpr auto elements = 2;
+        constexpr auto elements = 1;
         unsigned char buffer[elements];
         softUart::syncAndReceiveBytes(buffer, elements);
         for(int i=0; i < elements; i++) {

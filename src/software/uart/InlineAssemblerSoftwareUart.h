@@ -8,8 +8,7 @@
 #include "external/Sync.h"
 
 namespace lib::software {
-    static volatile unsigned char receiveBuffer;
-
+    extern "C" volatile uint8_t receiveBuffer;
     template<typename mcu>
     class SoftwareUart<mcu, SoftUartMethod::Assembler> {
     private:
@@ -48,15 +47,17 @@ namespace lib::software {
             return receiveBuffer;
         }
 
+        //TODO: save bh / bhl externally (something like uint16_t) + %A[bh] / %B[bh], =w
+        //https://rn-wissen.de/wiki/index.php?title=Inline-Assembler_in_avr-gcc
         static auto waitForSync() {
             asm volatile(R"(
                 rjmp waitForSyncASM
-                .skipHigh:
+                skipHigh:
                         sbic %[pin],%[bit]
-                        rjmp .skipHigh
-                .skipLow:
+                        rjmp skipHigh
+                skipLow:
                         sbis %[pin],%[bit]
-                        rjmp .skipLow
+                        rjmp skipLow
                 waitForSyncASM:
                         clr r24
                         clr r25
@@ -74,13 +75,13 @@ namespace lib::software {
                         sbiw r24,5
                         sbis %[pin],%[bit]
                         rjmp CL5
-                        brmi .skipHigh
+                        brmi skipHigh
                 wop0:
                         rcall receiveByte
                         lds r20, %[rb]
                         cpi r20, lo8(85)
                         brne wop0
-                        ret
+                ;        ret
             )"
             : [rb] "=m" (receiveBuffer)
             : [pin] "I" (_SFR_IO_ADDR(PIND)), [bit] "n" (RXBIT)
