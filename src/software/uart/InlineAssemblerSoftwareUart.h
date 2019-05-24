@@ -8,7 +8,9 @@
 #include "external/Sync.h"
 
 namespace lib::software {
-    extern "C" volatile uint8_t receiveBuffer;
+    extern "C" {
+        volatile uint8_t receiveBuffer;
+    }
     template<typename mcu>
     class SoftwareUart<mcu, SoftUartMethod::Assembler> {
     private:
@@ -44,7 +46,6 @@ namespace lib::software {
             : [rb] "=m" (receiveBuffer)
             : [pin] "I" (_SFR_IO_ADDR(PIND)), [bit] "n" (RXBIT)
             : "r20", "r21", "r24", "r25");
-            return receiveBuffer;
         }
 
         //TODO: save bh / bhl externally (something like uint16_t) + %A[bh] / %B[bh], =w
@@ -65,14 +66,14 @@ namespace lib::software {
                         sbic %[pin],%[bit]
                         rjmp CL2
                 CL3:
-                        adiw r24,5
+                        adiw r24, 5
                         sbis %[pin],%[bit]
                         rjmp CL3
                 CL4:
                         sbic %[pin],%[bit]
                         rjmp CL4
                 CL5:
-                        sbiw r24,5
+                        sbiw r24, 5
                         sbis %[pin],%[bit]
                         rjmp CL5
                         brmi skipHigh
@@ -91,16 +92,16 @@ namespace lib::software {
         static auto syncAndReceiveBytes(uint8_t* input, uint8_t elements) {
             waitForSync();
             for(uint8_t i=0; i < elements; i++) {
-                input[i] = receiveData();
+                receiveData();
+                input[i] = receiveBuffer;
             }
+            return input;
         }
 
         template<auto pinNumber, auto minBaud, auto maxBaud>
         static constexpr void init() {
             pin::setDirection<pin::Pin<mcu, pinNumber>, pin::Direction::INPUT>();
             pin::setInputState<pin::Pin<mcu, pinNumber>, pin::InputState::PULLUP>();
-
-            //waitForSync();
         }
     };
 }

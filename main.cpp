@@ -24,7 +24,7 @@ int main() {
     softUart::init<0, 9600_baud, 19200_baud>();
 
     while(true) {
-        constexpr auto elements = 1;
+        constexpr auto elements = 10;
         unsigned char buffer[elements];
         softUart::syncAndReceiveBytes(buffer, elements);
         for(int i=0; i < elements; i++) {
