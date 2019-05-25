@@ -10,6 +10,7 @@
 namespace lib::software {
     extern "C" {
         volatile uint8_t receiveBuffer;
+        volatile uint16_t counterBuffer = 0;
     }
     template<typename mcu, auto pinNumber>
         requires mcu::family == MCUFamilies::AVR && pin::isAbstractPin<pin::Pin<mcu, pinNumber>>
@@ -17,14 +18,24 @@ namespace lib::software {
     private:
         static constexpr auto RXBIT = 0;
         //https://rn-wissen.de/wiki/index.php?title=Inline-Assembler_in_avr-gcc
-        static auto receiveData() {
+        //We can't have a return value here, as it'll manipulate the timings
+        static void receiveData() {
             asm volatile(R"(
+                rjmp receiveByte
+                WaitBitcell:
+                        movw xl, %A[cb]
+                wbc0:
+                        sbiw xl, 4
+                        brcc wbc0
+                wbcx:
+                        sts %[rb], r20
+                        ret
                 receiveByte:
                         sbic %[pin],%[bit]
                         rjmp receiveByte
                         ldi r21, lo8(8)
                 CL9:
-                        movw xl, r24
+                        movw xl, %A[cb]
                         lsr xh
                         ror xl
                         ldi r21, 9
@@ -35,19 +46,10 @@ namespace lib::software {
                         ori r20, 128
                         dec r21
                         brne rxb3
-                        ret
-                WaitBitcell:
-                        movw xl, r24
-                wbc0:
-                        sbiw xl, 4
-                        brcc wbc0
-                wbcx:
-                        sts %[rb], r20
-                        ret
             )"
-            : [rb] "=m" (receiveBuffer)
+            : [rb] "=m" (receiveBuffer), [cb] "=w" (counterBuffer)
             : [pin] "I" (_SFR_IO_ADDR(PIND)), [bit] "n" (RXBIT)
-            : "r20", "r21", "r24", "r25");
+            : "r20", "r21");
         }
 
         static auto waitForSync() {
@@ -60,20 +62,20 @@ namespace lib::software {
                         sbis %[pin],%[bit]
                         rjmp skipLow
                 waitForSyncASM:
-                        clr r24
-                        clr r25
+                        clr %A[cb]
+                        clr %B[cb]
                 CL2:
                         sbic %[pin],%[bit]
                         rjmp CL2
                 CL3:
-                        adiw r24, 5
+                        adiw %A[cb], 5
                         sbis %[pin],%[bit]
                         rjmp CL3
                 CL4:
                         sbic %[pin],%[bit]
                         rjmp CL4
                 CL5:
-                        sbiw r24, 5
+                        sbiw %A[cb], 5
                         sbis %[pin],%[bit]
                         rjmp CL5
                         brmi skipHigh
@@ -84,9 +86,9 @@ namespace lib::software {
                         brne wop0
                 ;        ret
             )"
-            : [rb] "=m" (receiveBuffer)
+            : [rb] "=m" (receiveBuffer), [cb] "=w" (counterBuffer)
             : [pin] "I" (_SFR_IO_ADDR(PIND)), [bit] "n" (RXBIT)
-            : "r20", "r21", "r24", "r25");
+            : "r20", "r21");
         }
     public:
         static auto syncAndReceiveBytes(uint8_t* input, uint8_t elements) {
@@ -96,6 +98,19 @@ namespace lib::software {
                 input[i] = receiveBuffer;
             }
             return input;
+        }
+
+        static auto getWord() {
+            uint16_t word = 0;
+            waitForSync();
+
+            receiveData();
+            word = receiveBuffer;
+
+            receiveData();
+            word |= (uint16_t)receiveBuffer << 8u;
+
+            return word;
         }
 
         template<auto minBaud, auto maxBaud>

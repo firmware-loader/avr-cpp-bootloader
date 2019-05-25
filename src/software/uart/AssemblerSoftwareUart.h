@@ -9,6 +9,7 @@
 
 namespace lib::software {
     template<typename mcu, auto pinNumber>
+        requires mcu::family == MCUFamilies::AVR && pin::isAbstractPin<pin::Pin<mcu, pinNumber>>
     class SoftwareUart<mcu, pinNumber, SoftUartMethod::Assembler> {
     private:
         static constexpr auto preamble = 0x55;
@@ -25,6 +26,16 @@ namespace lib::software {
             for(uint8_t i=0; i < elements; i++) {
                 input[i] = receiveData();
             }
+        }
+
+        static auto getWord() {
+            uint16_t word = 0;
+            waitForSync();
+
+            word = receiveData();
+            word |= (uint16_t)receiveData() << 8u;
+
+            return word;
         }
 
         template<auto minBaud, auto maxBaud>

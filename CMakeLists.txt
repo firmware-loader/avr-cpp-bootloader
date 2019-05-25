@@ -27,8 +27,8 @@ SET(EEPROM NO)	     	        	# <-- soll eine x.eep Datei erstellt werden?
 SET(FLASH NO)		        	# <-- soll Geflasht werden?
 SET(ASM NO)
 
-#SET(BOOTPOSITION 0x7C00)
-SET(BOOTPOSITION 0x00)
+SET(BOOTPOSITION 0x7C00)
+#SET(BOOTPOSITION 0x00)
 
 #============================================================================================
 

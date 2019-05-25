@@ -12,24 +12,27 @@
 #include "src/software/uart/InlineAssemblerSoftwareUart.h"
 #include "src/software/uart/AssemblerSoftwareUart.h"
 #include "src/software/uart/external/Sync.h"
+#include "src/hal/avr/utils/bootloader/mega/Boot.h"
 
 
 using mcu = lib::avr::ATMega328;
 
 int main() {
     using namespace lib::software::literals;
-    using uart = lib::software::Uart<mcu>;
-    using softUart = lib::software::SoftwareUart<mcu, 0, lib::software::SoftUartMethod::Assembler>;
+    //using uart = lib::software::Uart<mcu>;
+    using softUart = lib::software::SoftwareUart<mcu, 0, lib::software::SoftUartMethod::InlineAssembler>;
+    using bootloader = lib::avr::boot::BootloaderHal<mcu>;
 
-    uart::init<14400_baud>();
+    //uart::init<19200_baud>();
     softUart::init<9600_baud, 19200_baud>();
+    bootloader::writeToFlash(0x00, softUart::getWord);
 
     while(true) {
-        constexpr auto elements = 5;
-        unsigned char buffer[elements];
-        softUart::syncAndReceiveBytes(buffer, elements);
+        //constexpr auto elements = 2;
+        //unsigned char buffer[elements];
+        /*softUart::syncAndReceiveBytes(buffer, elements);
         for(int i=0; i < elements; i++) {
             uart::sendChar(buffer[i]);
-        }
+        }*/
     }
 }

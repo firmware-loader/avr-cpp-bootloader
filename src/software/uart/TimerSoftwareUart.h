@@ -33,40 +33,6 @@ namespace lib::software {
             }
         }
 
-    public:
-        static constexpr auto preamble = 0x55;
-
-        template<Baud minBaud, Baud maxBaud>
-        static constexpr void init() {
-            using namespace lib::software::literals;
-            constexpr auto timerClockSpeed = 250000_hz;
-            constexpr auto ullMinBaud = static_cast<unsigned long long>(minBaud);
-            constexpr auto ullMaxBaud = static_cast<unsigned long long>(maxBaud);
-
-            timer::template init<timerClockSpeed>();
-            constexpr auto realTimerValue = static_cast<unsigned long long>(timer::template getRealClockValue<timerClockSpeed>());
-            constexpr long double timerOffset = (static_cast<unsigned long long>(timerClockSpeed) /
-                                                 (long double) realTimerValue);
-
-            static_assert(timerOffset <= 1.1 && timerOffset >= 0.9, "Timer Offset not within acceptable error margin!");
-            static_assert(realTimerValue / ullMinBaud <= utils::getMaxValueOfBitcount<timer::timerBitCount()>(),
-                          "Timer will overflow at minimum baud rate!");
-            static_assert(realTimerValue / ullMinBaud > 0, "Timer too slow for maximum baud rate!");
-            static_assert((realTimerValue / (long double) ullMinBaud) -
-                          utils::math::floor(realTimerValue / (long double) ullMinBaud) <= 0.1,
-                          "Minimum Baud not within acceptable error margin!");
-            static_assert((realTimerValue / (long double) ullMaxBaud) -
-                          utils::math::floor(realTimerValue / (long double) ullMaxBaud) <= 0.1,
-                          "Maximum Baud not within acceptable error margin!");
-            static_assert(ullMinBaud <= ullMaxBaud, "Minimum Baud has to be below or equal to maximum baud!");
-
-
-            pin::setDirection<pin::Pin<mcu, pinNumber>, pin::Direction::INPUT>();
-            pin::setInputState<pin::Pin<mcu, pinNumber>, pin::InputState::PULLUP>();
-
-            waitForSync();
-        }
-
         static auto waitForSync() {
             while (true) {
                 while (isHigh()) {}           //skip first high
@@ -110,6 +76,51 @@ namespace lib::software {
             }
             while (!isHigh()) {}                  // skip last low (stop bit)
             return buffer;
+        }
+    public:
+        static constexpr auto preamble = 0x55;
+
+        template<Baud minBaud, Baud maxBaud>
+        static constexpr void init() {
+            using namespace lib::software::literals;
+            constexpr auto timerClockSpeed = 250000_hz;
+            constexpr auto ullMinBaud = static_cast<unsigned long long>(minBaud);
+            constexpr auto ullMaxBaud = static_cast<unsigned long long>(maxBaud);
+
+            timer::template init<timerClockSpeed>();
+            constexpr auto realTimerValue = static_cast<unsigned long long>(timer::template getRealClockValue<timerClockSpeed>());
+            constexpr long double timerOffset = (static_cast<unsigned long long>(timerClockSpeed) /
+                                                 (long double) realTimerValue);
+
+            static_assert(timerOffset <= 1.1 && timerOffset >= 0.9, "Timer Offset not within acceptable error margin!");
+            static_assert(realTimerValue / ullMinBaud <= utils::getMaxValueOfBitcount<timer::timerBitCount()>(),
+                          "Timer will overflow at minimum baud rate!");
+            static_assert(realTimerValue / ullMinBaud > 0, "Timer too slow for maximum baud rate!");
+            static_assert((realTimerValue / (long double) ullMinBaud) -
+                          utils::math::floor(realTimerValue / (long double) ullMinBaud) <= 0.1,
+                          "Minimum Baud not within acceptable error margin!");
+            static_assert((realTimerValue / (long double) ullMaxBaud) -
+                          utils::math::floor(realTimerValue / (long double) ullMaxBaud) <= 0.1,
+                          "Maximum Baud not within acceptable error margin!");
+            static_assert(ullMinBaud <= ullMaxBaud, "Minimum Baud has to be below or equal to maximum baud!");
+
+
+            pin::setDirection<pin::Pin<mcu, pinNumber>, pin::Direction::INPUT>();
+            pin::setInputState<pin::Pin<mcu, pinNumber>, pin::InputState::PULLUP>();
+
+            waitForSync();
+        }
+
+
+
+        static auto getWord() {
+            uint16_t word = 0;
+            waitForSync();
+
+            word = receiveData();
+            word |= (uint16_t)receiveData() << 8u;
+
+            return word;
         }
     };
 

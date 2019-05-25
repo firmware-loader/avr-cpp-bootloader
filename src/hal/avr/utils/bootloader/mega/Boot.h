@@ -4,17 +4,54 @@
 
 #pragma once
 
+#include <stdint-gcc.h>
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <avr/eeprom.h>
+#include <avr/boot.h>
+#include "../../../../../utils/TypeTraits.h"
+
 namespace lib::avr::boot {
-    <template typename mcu>
+    template<typename mcu>
     struct BootloaderHal {
     private:
         static constexpr void (*start)() = 0x0000;
     public:
-        static constexpr writeToFlash(mcu::mem_width data) {
+        template<typename T>
+        //requires is_same<decltype(T()()), uint16_t>::value_type
+        static auto writeToFlash(uint32_t page, T readMethod) {
+            static_assert(utils::is_same<decltype(T()()), uint16_t>());
+
+            uint8_t sreg = SREG;
+            cli();
+
+            eeprom_busy_wait();
+
+            boot_page_erase(page);
+            boot_spm_busy_wait();
+            for (uint16_t i=0; i<SPM_PAGESIZE; i+=2)
+            {
+                uint16_t w = readMethod();
+
+                boot_page_fill(page + i, w);
+            }
+
+            boot_page_write (page);
+            boot_spm_busy_wait();
+
+
+            boot_rww_enable();
+
+
+            SREG = sreg;
+            //startUserProgram();
+        }
+        static auto flushData() {
 
         }
-        static constexpr flushData() {
 
+        static constexpr auto startUserProgram() {
+            start();
         }
     };
 }
