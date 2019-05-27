@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "SoftwareUart.h"
+#include "../SoftwareUart.h"
 #include "external/Sync.h"
 
 namespace lib::software {
@@ -36,6 +36,19 @@ namespace lib::software {
             word |= (uint16_t)receiveData() << 8u;
 
             return word;
+        }
+
+        template<auto N> requires utils::is_arithmetic<decltype(N)>::value
+        static auto getBytes() {
+            using type = utils::byte_type<N>::value_type;
+            type value = 0;
+            waitForSync();
+
+            for(auto i=0; i < N; i++) {
+                value |= receiveData() << (8u * i);
+            }
+
+            return value;
         }
 
         template<auto minBaud, auto maxBaud>

@@ -15,7 +15,7 @@ namespace lib::software {
     private:
         static int16_t bitcellLength;
         using timer = AbstractTimer<mcu>;
-        static constexpr auto blockstart = 0xCC;
+        static constexpr auto praeamble = 0x55;
 
         static constexpr auto isHigh() {
             using pin = pin::Pin<mcu, 0>::value;
@@ -59,6 +59,7 @@ namespace lib::software {
                     break;                  //sync
                 }
             }
+            while (receiveData() != praeamble) {}
         }
 
         static auto receiveData() {
@@ -67,7 +68,7 @@ namespace lib::software {
             while (isHigh()) {}                   // skip everything before start (this will keep the sync)
             for (; i < 9; i++) {                  // 8-N-1 (will overwrite start bit)
                 auto startValue = timer::readValue();
-                _delay_us(10);                  // todo: replace this
+                for(int tmp = bitcellLength; tmp > 0; tmp--) { asm(""); }
                 buffer /= 2;                    // lshift
                 if (isHigh()) {
                     buffer |= (1u << 7u);
@@ -83,7 +84,7 @@ namespace lib::software {
         template<Baud minBaud, Baud maxBaud>
         static constexpr void init() {
             using namespace lib::software::literals;
-            constexpr auto timerClockSpeed = 250000_hz;
+            constexpr auto timerClockSpeed = 187500_hz;
             constexpr auto ullMinBaud = static_cast<unsigned long long>(minBaud);
             constexpr auto ullMaxBaud = static_cast<unsigned long long>(maxBaud);
 
@@ -92,7 +93,7 @@ namespace lib::software {
             constexpr long double timerOffset = (static_cast<unsigned long long>(timerClockSpeed) /
                                                  (long double) realTimerValue);
 
-            static_assert(timerOffset <= 1.1 && timerOffset >= 0.9, "Timer Offset not within acceptable error margin!");
+            static_assert(timerOffset <= 1.1 && timerOffset >= 0.9, "Timer Value not within acceptable error margin (change timerClockSpeed)!");
             static_assert(realTimerValue / ullMinBaud <= utils::getMaxValueOfBitcount<timer::timerBitCount()>(),
                           "Timer will overflow at minimum baud rate!");
             static_assert(realTimerValue / ullMinBaud > 0, "Timer too slow for maximum baud rate!");
@@ -121,6 +122,19 @@ namespace lib::software {
             word |= (uint16_t)receiveData() << 8u;
 
             return word;
+        }
+
+        template<auto N> requires utils::is_arithmetic<decltype(N)>::value
+        static auto getBytes() {
+            using type = utils::byte_type<N>::value_type;
+            type value = 0;
+            waitForSync();
+
+            for(auto i=0; i < N; i++) {
+                value |= receiveData() << (8u * i);
+            }
+
+            return value;
         }
     };
 

@@ -124,5 +124,27 @@ namespace utils {
     struct is_unsigned : detail::is_unsigned<T>::type {
     };
 
+    template<auto N> requires is_arithmetic<decltype(N)>::value
+    struct byte_type;
+
+    template<>
+    struct byte_type<1>{
+        using value_type = uint8_t;
+    };
+
+    template<>
+    struct byte_type<2> {
+        using value_type = uint16_t;
+    };
+
+    template<>
+    struct byte_type<4> {
+        using value_type = uint32_t;
+    };
+
+    template<>
+    struct byte_type<8> {
+        using value_type = uint64_t;
+    };
 }
 

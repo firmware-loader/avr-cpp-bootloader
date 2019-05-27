@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "SoftwareUart.h"
+#include "../SoftwareUart.h"
 #include "external/Sync.h"
 
 namespace lib::software {
@@ -17,6 +17,7 @@ namespace lib::software {
     class SoftwareUart<mcu, pinNumber, SoftUartMethod::InlineAssembler> {
     private:
         static constexpr auto RXBIT = 0;
+        using selectedPin = pin::Pin<mcu, pinNumber>::value;
         //https://rn-wissen.de/wiki/index.php?title=Inline-Assembler_in_avr-gcc
         //We can't have a return value here, as it'll manipulate the timings
         static void receiveData() {
@@ -111,6 +112,20 @@ namespace lib::software {
             word |= (uint16_t)receiveBuffer << 8u;
 
             return word;
+        }
+
+        template<auto N> requires utils::is_arithmetic<decltype(N)>::value
+        static auto getBytes() {
+            using type = utils::byte_type<N>::value_type;
+            type value = 0;
+            waitForSync();
+
+            for(auto i=0; i < N; i++) {
+                receiveData();
+                value |= receiveBuffer << (8u * i);
+            }
+
+            return value;
         }
 
         template<auto minBaud, auto maxBaud>
