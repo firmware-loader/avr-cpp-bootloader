@@ -44,8 +44,8 @@ namespace lib::software {
             type value = 0;
             waitForSync();
 
-            for(auto i=0; i < N; i++) {
-                value |= receiveData() << (8u * i);
+            for(typename mcu::mem_width i=0; i < N; i++) {
+                value |= static_cast<type>(receiveData() << (8u * i));
             }
 
             return value;

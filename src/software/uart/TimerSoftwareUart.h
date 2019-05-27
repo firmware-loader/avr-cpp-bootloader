@@ -68,7 +68,7 @@ namespace lib::software {
             while (isHigh()) {}                   // skip everything before start (this will keep the sync)
             for (; i < 9; i++) {                  // 8-N-1 (will overwrite start bit)
                 auto startValue = timer::readValue();
-                for(int tmp = bitcellLength; tmp > 0; tmp--) { asm(""); }
+                for(int tmp = bitcellLength / 2; tmp > 0; tmp--) { asm(""); }
                 buffer /= 2;                    // lshift
                 if (isHigh()) {
                     buffer |= (1u << 7u);
@@ -130,8 +130,8 @@ namespace lib::software {
             type value = 0;
             waitForSync();
 
-            for(auto i=0; i < N; i++) {
-                value |= receiveData() << (8u * i);
+            for(typename mcu::mem_width i=0; i < N; i++) {
+                value |= static_cast<type>(receiveData() << (8u * i));
             }
 
             return value;
