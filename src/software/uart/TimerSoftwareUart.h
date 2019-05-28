@@ -8,11 +8,13 @@
 #include "../../hal/concepts/Pin.h"
 #include "../Literals.h"
 
+
 namespace lib::software {
     template<typename mcu, auto pinNumber>
         requires pin::isAbstractPin<pin::Pin<mcu, pinNumber>>
     class SoftwareUart<mcu, pinNumber, SoftUartMethod::Timer> {
     private:
+
         static int16_t bitcellLength;
         using timer = AbstractTimer<mcu>;
         static constexpr auto praeamble = 0x55;
@@ -33,7 +35,7 @@ namespace lib::software {
             }
         }
 
-        static auto waitForSync() {
+        static void waitForSync() {
             while (true) {
                 while (isHigh()) {}           //skip first high
 
@@ -59,7 +61,8 @@ namespace lib::software {
                     break;                  //sync
                 }
             }
-            while (receiveData() != praeamble) {}
+            while (receiveData() != praeamble) {
+            }
         }
 
         static auto receiveData() {
@@ -84,7 +87,7 @@ namespace lib::software {
         template<Baud minBaud, Baud maxBaud>
         static constexpr void init() {
             using namespace lib::software::literals;
-            constexpr auto timerClockSpeed = 187500_hz;
+            constexpr auto timerClockSpeed = 250000_hz;
             constexpr auto ullMinBaud = static_cast<unsigned long long>(minBaud);
             constexpr auto ullMaxBaud = static_cast<unsigned long long>(maxBaud);
 
@@ -92,11 +95,13 @@ namespace lib::software {
             constexpr auto realTimerValue = static_cast<unsigned long long>(timer::template getRealClockValue<timerClockSpeed>());
             constexpr long double timerOffset = (static_cast<unsigned long long>(timerClockSpeed) /
                                                  (long double) realTimerValue);
+            constexpr long double TimerTicksPerBaud = realTimerValue / ullMaxBaud;
 
             static_assert(timerOffset <= 1.1 && timerOffset >= 0.9, "Timer Value not within acceptable error margin (change timerClockSpeed)!");
+            static_assert(realTimerValue / ullMinBaud > 0, "Timer too slow for minimum baud rate!");
+            static_assert(TimerTicksPerBaud < 1000, "Timer too slow or baud rate too high!");
             static_assert(realTimerValue / ullMinBaud <= utils::getMaxValueOfBitcount<timer::timerBitCount()>(),
                           "Timer will overflow at minimum baud rate!");
-            static_assert(realTimerValue / ullMinBaud > 0, "Timer too slow for maximum baud rate!");
             static_assert((realTimerValue / (long double) ullMinBaud) -
                           utils::math::floor(realTimerValue / (long double) ullMinBaud) <= 0.1,
                           "Minimum Baud not within acceptable error margin!");
@@ -108,8 +113,6 @@ namespace lib::software {
 
             pin::setDirection<pin::Pin<mcu, pinNumber>, pin::Direction::INPUT>();
             pin::setInputState<pin::Pin<mcu, pinNumber>, pin::InputState::PULLUP>();
-
-            waitForSync();
         }
 
 

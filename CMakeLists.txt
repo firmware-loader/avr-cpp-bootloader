@@ -12,7 +12,7 @@ PROJECT(Bootloader CXX ASM)		  		# <-- Prjektname
 SET(FILES main.cpp src/hal/avr/mcus/mega328/Mega328.h src/hal/avr/Register.h src/lib/type_traits.h src/abstraction/uart/AbstractUart.h src/concepts/McuCheck.h src/hal/avr/pin/Control.h src/hal/avr/utils/AvrUtils.h src/hal/avr/utils/Uart.h src/hal/MCUFamilies.h src/software/uart/SoftwareUart.h src/hal/avr/utils/Timer16.h src/hal/avr/mcus/mega328/PinMap.h src/abstraction/pins/PinControl.h src/hal/avr/utils/Timer8.h src/abstraction/timer/AbstractTimer.h src/utils/custom_limits.h src/utils/TypeTraits.h src/concepts/TypeCheck.h src/hal/avr/utils/bootloader/mega/Boot.h src/utils/Utility.h src/software/uart/TimerSoftwareUart.h src/software/uart/vendorspecific/AssemblerSoftwareUart.h src/hal/concepts/Pin.h src/software/Literals.h src/software/uart/vendorspecific/external/Sync.h src/software/uart/vendorspecific/external/Sync.S src/software/uart/vendorspecific/InlineAssemblerSoftwareUart.h)		  	# <-- Quelldatei(en)
 
 SET(DEVICE atmega328p)			# <-- MCU
-SET(FREQ 12000000)			# <-- MCU-Frequenz
+SET(FREQ 16000000)			# <-- MCU-Frequenz
 
 SET(AVRBIN "/bin/gcc9/linux/bin/")		# <-- Toolchain
 SET(AVROBJCOPY avr-objcopy)		# <--     ""

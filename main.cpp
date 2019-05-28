@@ -23,13 +23,13 @@ int main() {
     using softUart = lib::software::SoftwareUart<mcu, 0, lib::software::SoftUartMethod::InlineAssembler>;
     using bootloader = lib::avr::boot::BootloaderHal<mcu>;
 
-    uart::init<57600_baud>();
-    softUart::init<600_baud, 57600_baud>();
+    uart::init<19200_baud>();
+    softUart::init<19200_baud, 19200_baud>();
     //bootloader::writeToFlash(0x00, softUart::getWord);
 
     while(true) {
         auto word = softUart::getBytes<2>();
         uart::sendChar(word & 0xFF);
-        uart::sendChar((word >> 8));
+        uart::sendChar((word >> 8) & 0xFF);
     }
 }

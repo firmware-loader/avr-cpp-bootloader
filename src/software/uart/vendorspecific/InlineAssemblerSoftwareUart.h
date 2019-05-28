@@ -120,9 +120,9 @@ namespace lib::software {
             type value = 0;
             waitForSync();
 
-            for(auto i=0; i < N; i++) {
+            for(typename mcu::mem_width i=0; i < N; i++) {
                 receiveData();
-                value |= receiveBuffer << (8u * i);
+                value |= static_cast<type>(receiveBuffer << (8u * i));
             }
 
             return value;

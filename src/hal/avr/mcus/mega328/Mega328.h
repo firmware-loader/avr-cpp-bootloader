@@ -29,6 +29,7 @@ namespace lib::avr {
         struct ATMega328 final
         {
             static constexpr MCUFamilies family = MCUFamilies::AVR;
+            static constexpr auto frequency = F_CPU;
             using mem_width = uint8_t;
             ATMega328() = delete;
             struct Port final
