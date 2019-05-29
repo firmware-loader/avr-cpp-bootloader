@@ -48,8 +48,8 @@ namespace lib::software {
                         dec r21
                         brne rxb3
             )"
-            : [rb] "=m" (receiveBuffer), [cb] "+w" (counterBuffer)
-            : [pin] "I" (_SFR_IO_ADDR(PIND)), [bit] "n" (RXBIT)
+            : [rb] "=m" (receiveBuffer)
+            : [pin] "I" (_SFR_IO_ADDR(PIND)), [bit] "n" (RXBIT), [cb] "w" (counterBuffer)
             : "r20", "r21");
         }
 
@@ -87,7 +87,7 @@ namespace lib::software {
                         brne wop0
                 ;        ret
             )"
-            : [rb] "=m" (receiveBuffer), [cb] "+w" (counterBuffer)
+            : [rb] "=m" (receiveBuffer), [cb] "=w" (counterBuffer)
             : [pin] "I" (_SFR_IO_ADDR(PIND)), [bit] "n" (RXBIT)
             : "r20", "r21");
         }
