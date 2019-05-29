@@ -117,7 +117,7 @@ namespace lib::software {
         template<auto N> requires utils::is_arithmetic<decltype(N)>::value
         static auto  getBytes() {
             using type = utils::byte_type<N>::value_type;
-            uint32_t value = 0;
+            type value = 0;
             waitForSync();
 
 

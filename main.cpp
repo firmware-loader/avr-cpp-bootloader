@@ -28,10 +28,14 @@ int main() {
     //bootloader::writeToFlash(0x00, softUart::getWord);
 
     while(true) {
-        uint32_t word = softUart::getBytes<4>();
+        auto word = softUart::getBytes<8>();
         uart::sendChar(word & 0xFF);
-        uart::sendChar((word >> 8u) & 0xFF);
+        uart::sendChar((word >> 8u));
         uart::sendChar((word >> 16u));
         uart::sendChar((word >> 24u));
+        uart::sendChar((word >> 32u));
+        uart::sendChar((word >> 40u));
+        uart::sendChar((word >> 48u));
+        uart::sendChar((word >> 56u));
     }
 }
