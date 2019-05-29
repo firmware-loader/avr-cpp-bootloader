@@ -48,7 +48,7 @@ namespace lib::software {
                         dec r21
                         brne rxb3
             )"
-            : [rb] "=m" (receiveBuffer), [cb] "=w" (counterBuffer)
+            : [rb] "=m" (receiveBuffer), [cb] "+w" (counterBuffer)
             : [pin] "I" (_SFR_IO_ADDR(PIND)), [bit] "n" (RXBIT)
             : "r20", "r21");
         }
@@ -87,7 +87,7 @@ namespace lib::software {
                         brne wop0
                 ;        ret
             )"
-            : [rb] "=m" (receiveBuffer), [cb] "=w" (counterBuffer)
+            : [rb] "=m" (receiveBuffer), [cb] "+w" (counterBuffer)
             : [pin] "I" (_SFR_IO_ADDR(PIND)), [bit] "n" (RXBIT)
             : "r20", "r21");
         }
@@ -115,16 +115,16 @@ namespace lib::software {
         }
 
         template<auto N> requires utils::is_arithmetic<decltype(N)>::value
-        static auto getBytes() {
+        static auto  getBytes() {
             using type = utils::byte_type<N>::value_type;
-            type value = 0;
+            uint32_t value = 0;
             waitForSync();
+
 
             for(typename mcu::mem_width i=0; i < N; i++) {
                 receiveData();
-                value |= static_cast<type>(receiveBuffer << (8u * i));
+                value |= static_cast<type>(receiveBuffer) << (8u * i);
             }
-
             return value;
         }
 

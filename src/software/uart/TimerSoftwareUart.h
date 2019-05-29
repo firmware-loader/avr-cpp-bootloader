@@ -61,8 +61,7 @@ namespace lib::software {
                     break;                  //sync
                 }
             }
-            while (receiveData() != praeamble) {
-            }
+            while (receiveData() != praeamble) {}
         }
 
         static auto receiveData() {
@@ -129,12 +128,12 @@ namespace lib::software {
 
         template<auto N> requires utils::is_arithmetic<decltype(N)>::value
         static auto getBytes() {
+            waitForSync();
             using type = utils::byte_type<N>::value_type;
             type value = 0;
-            waitForSync();
 
             for(typename mcu::mem_width i=0; i < N; i++) {
-                value |= static_cast<type>(receiveData() << (8u * i));
+                value |= static_cast<type>(receiveData()) << (8u * i);
             }
 
             return value;
