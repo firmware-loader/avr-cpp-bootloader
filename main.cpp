@@ -23,19 +23,35 @@ int main() {
     using softUart = lib::software::SoftwareUart<mcu, 0, lib::software::SoftUartMethod::InlineAssembler>;
     using bootloader = lib::avr::boot::BootloaderHal<mcu>;
 
-    uart::init<9600_baud>();
-    softUart::init<9600_baud, 9600_baud>();
-    //bootloader::writeToFlash(0x00, softUart::getWord);
+    uart::init<57600_baud>();
+    softUart::init<57600_baud, 57600_baud>();
+    bootloader::writeToFlash(0x00, softUart::getWord);
 
     while(true) {
-        auto word = softUart::getBytes<8>();
-        uart::sendChar(word & 0xFF);
+        /*auto word = softUart::getBytes<16>();
+        uart::sendChar(word[0]);
+        uart::sendChar(word[1]);
+        uart::sendChar(word[2]);
+        uart::sendChar(word[3]);
+        uart::sendChar(word[4]);
+        uart::sendChar(word[5]);
+        uart::sendChar(word[6]);
+        uart::sendChar(word[7]);
+        uart::sendChar(word[8]);
+        uart::sendChar(word[9]);
+        uart::sendChar(word[10]);
+        uart::sendChar(word[11]);
+        uart::sendChar(word[12]);
+        uart::sendChar(word[13]);
+        uart::sendChar(word[14]);
+        uart::sendChar(word[15]);*/
+        /*uart::sendChar(word & 0xFF);
         uart::sendChar((word >> 8u));
         uart::sendChar((word >> 16u));
         uart::sendChar((word >> 24u));
         uart::sendChar((word >> 32u));
         uart::sendChar((word >> 40u));
         uart::sendChar((word >> 48u));
-        uart::sendChar((word >> 56u));
+        uart::sendChar((word >> 56u));*/
     }
 }

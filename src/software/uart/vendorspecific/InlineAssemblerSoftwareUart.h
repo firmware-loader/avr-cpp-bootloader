@@ -114,7 +114,7 @@ namespace lib::software {
             return word;
         }
 
-        template<auto N> requires utils::is_arithmetic<decltype(N)>::value
+        template<auto N> requires utils::is_arithmetic<decltype(N)>::value && N <= 8
         static auto  getBytes() {
             using type = utils::byte_type<N>::value_type;
             type value = 0;
@@ -124,6 +124,17 @@ namespace lib::software {
             for(typename mcu::mem_width i=0; i < N; i++) {
                 receiveData();
                 value |= static_cast<type>(receiveBuffer) << (8u * i);
+            }
+            return value;
+        }
+
+        template<auto N> requires utils::is_arithmetic<decltype(N)>::value && N > 8
+        static unsigned char* getBytes() {
+            static unsigned char value[N];
+            waitForSync();
+            for(typename mcu::mem_width i=0; i < N; i++) {
+                receiveData();
+                value[i] = receiveBuffer;
             }
             return value;
         }

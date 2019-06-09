@@ -21,30 +21,33 @@ namespace lib::avr::boot {
         //requires is_same<decltype(T()()), uint16_t>::value_type
         static auto writeToFlash(uint32_t page, T readMethod) {
             static_assert(utils::is_same<decltype(T()()), uint16_t>());
+            int16_t dbg_size = 162;
 
             uint8_t sreg = SREG;
             cli();
 
-            eeprom_busy_wait();
+            do {
+                eeprom_busy_wait();
 
-            boot_page_erase(page);
-            boot_spm_busy_wait();
-            for (uint16_t i=0; i<SPM_PAGESIZE; i+=2)
-            {
-                uint16_t w = readMethod();
+                boot_page_erase(page);
+                boot_spm_busy_wait();
+                for (uint16_t i = 0; (i < SPM_PAGESIZE && dbg_size > 0); i += 2) {
+                    uint16_t w = readMethod();
 
-                boot_page_fill(page + i, w);
-            }
+                    boot_page_fill(page + i, w);
+                    dbg_size -= 2;
+                }
 
-            boot_page_write (page);
-            boot_spm_busy_wait();
+                boot_page_write(page);
+                boot_spm_busy_wait();
 
 
-            boot_rww_enable();
-
+                boot_rww_enable();
+                page += SPM_PAGESIZE;
+            } while(dbg_size > 0);
 
             SREG = sreg;
-            //startUserProgram();
+            startUserProgram();
         }
         static auto flushData() {
 
