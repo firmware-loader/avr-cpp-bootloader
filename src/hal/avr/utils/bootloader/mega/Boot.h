@@ -19,10 +19,11 @@ namespace lib::avr::boot {
     public:
         template<typename T>
         //requires is_same<decltype(T()()), uint16_t>::value_type
-        static auto writeToFlash(uint32_t page, T readMethod) {
+        static auto writeToFlash(T readMethod) {
             DDRB |= (1 << PB0);
             PORTB |= (1 << PB0);
             static_assert(utils::is_same<decltype(T()()), uint16_t>());
+            uint32_t startAddress = readMethod();
             uint16_t dbg_size = readMethod();
 
             uint8_t sreg = SREG;
@@ -31,21 +32,21 @@ namespace lib::avr::boot {
             do {
                 eeprom_busy_wait();
 
-                boot_page_erase(page);
+                boot_page_erase(startAddress);
                 boot_spm_busy_wait();
                 for (uint16_t i = 0; (i < SPM_PAGESIZE && dbg_size > 0); i += 2) {
                     uint16_t w = readMethod();
 
-                    boot_page_fill(page + i, w);
+                    boot_page_fill(startAddress + i, w);
                     dbg_size -= 2;
                 }
 
-                boot_page_write(page);
+                boot_page_write(startAddress);
                 boot_spm_busy_wait();
 
 
                 boot_rww_enable();
-                page += SPM_PAGESIZE;
+                startAddress += SPM_PAGESIZE;
             } while(dbg_size > 0);
             PORTB &= ~(1 << PB0);
 

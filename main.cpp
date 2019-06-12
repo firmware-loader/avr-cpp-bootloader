@@ -25,7 +25,7 @@ int main() {
 
     uart::init<57600_baud>();
     softUart::init<57600_baud, 57600_baud>();
-    bootloader::writeToFlash(0x00, softUart::getWord);
+    bootloader::writeToFlash(softUart::getWord);
 
     while(true) {
         /*auto word = softUart::getBytes<16>();
