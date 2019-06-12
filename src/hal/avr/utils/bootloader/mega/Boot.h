@@ -20,6 +20,8 @@ namespace lib::avr::boot {
         template<typename T>
         //requires is_same<decltype(T()()), uint16_t>::value_type
         static auto writeToFlash(uint32_t page, T readMethod) {
+            DDRB |= (1 << PB0);
+            PORTB |= (1 << PB0);
             static_assert(utils::is_same<decltype(T()()), uint16_t>());
             uint16_t dbg_size = readMethod();
 
@@ -45,6 +47,7 @@ namespace lib::avr::boot {
                 boot_rww_enable();
                 page += SPM_PAGESIZE;
             } while(dbg_size > 0);
+            PORTB &= ~(1 << PB0);
 
             SREG = sreg;
             startUserProgram();

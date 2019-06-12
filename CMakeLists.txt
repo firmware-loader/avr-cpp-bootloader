@@ -32,8 +32,9 @@ SET(BOOTPOSITION 0x7C00)
 
 #============================================================================================
 
+SET(ASM true)
 if(ASM)
-    SET(ASM_FLAG "-S -fverbose-asm")
+    SET(ASM_FLAG "-save-temps -fverbose-asm")
 endif(ASM)
 
 #set_source_files_properties(src/software/uart/external/blink_test.S PROPERTIES COMPILE_FLAGS "-x assembler-with-cpp ")
@@ -41,8 +42,8 @@ endif(ASM)
 SET(CMAKE_C_COMPILER ${AVRBIN}/avr-gcc)
 SET(CMAKE_CXX_COMPILER ${AVRBIN}/avr-g++)
 
-SET(CMAKE_C_FLAGS  "-Os -mmcu=${DEVICE} ${ASM_FLAG} -DBOOT_BAUD_RATE=9600 -DF_CPU=${FREQ}UL -std=gnu99 -Wl,--gc-sections -Ttext=${BOOTPOSITION}")
-SET(CMAKE_CXX_FLAGS "-Os -mmcu=${DEVICE} ${ASM_FLAG} -save-temps -DBOOT_BAUD_RATE=9600 -DF_CPU=${FREQ}UL -Wl,--gc-sections -fconcepts -Wall -Wextra -Wshadow -Wfloat-conversion -Wsign-conversion -Wsign-compare -Wmissing-field-initializers -fno-threadsafe-statics -Ttext=${BOOTPOSITION}")
+SET(CMAKE_C_FLAGS  "-Os -flto -mmcu=${DEVICE} ${ASM_FLAG} -DBOOT_BAUD_RATE=9600 -DF_CPU=${FREQ}UL -std=gnu99 -Wl,--gc-sections -Ttext=${BOOTPOSITION}")
+SET(CMAKE_CXX_FLAGS "-Os -flto -mmcu=${DEVICE} ${ASM_FLAG} -save-temps -DBOOT_BAUD_RATE=9600 -DF_CPU=${FREQ}UL -Wl,--gc-sections -fconcepts -Wall -Wextra -Wshadow -Wfloat-conversion -Wsign-conversion -Wsign-compare -Wmissing-field-initializers -fno-threadsafe-statics -Ttext=${BOOTPOSITION}")
 SET(CMAKE_ASM_FLAGS  "-mmcu=${DEVICE} -save-temps")
 
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
