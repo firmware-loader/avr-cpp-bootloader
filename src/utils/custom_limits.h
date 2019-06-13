@@ -65,7 +65,7 @@ namespace utils {
         return ULONG_MAX;
     }
 
-    template<>
+    /*template<>
     constexpr auto numeric_limits<long long>::max() {
         return LONG_LONG_MAX;
     }
@@ -73,7 +73,7 @@ namespace utils {
     template<>
     constexpr auto numeric_limits<unsigned long long>::max() {
         return ULONG_LONG_MAX;
-    }
+    }*/
 
     template<>
     constexpr auto numeric_limits<float>::max() {

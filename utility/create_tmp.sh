@@ -1,0 +1,2 @@
+#!/bin/bash
+/bin/gcc9/linux/bin/avr-g++ -std=c++2a -Os -flto -mmcu=atmega328p ${ASM_FLAG} -save-temps -DF_CPU=1000000UL -Wl,--gc-sections -fconcepts -Wall -Wextra -Wshadow -Wfloat-conversion -Wsign-conversion -Wsign-compare -Wmissing-field-initializers -fno-threadsafe-statics  -fverbose-asm -S ../main.cpp

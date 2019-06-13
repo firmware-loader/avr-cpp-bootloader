@@ -19,12 +19,12 @@ using mcu = lib::avr::ATMega328;
 
 int main() {
     using namespace lib::software::literals;
-    using uart = lib::software::Uart<mcu>;
+    //using uart = lib::software::Uart<mcu>;
     using softUart = lib::software::SoftwareUart<mcu, 0, lib::software::SoftUartMethod::InlineAssembler>;
     using bootloader = lib::avr::boot::BootloaderHal<mcu>;
 
-    uart::init<57600_baud>();
-    softUart::init<57600_baud, 57600_baud>();
+    //uart::init<57600_baud>();
+    softUart::init<9600_baud, 9600_baud>();
     bootloader::writeToFlash(softUart::getWord);
 
     while(true) {
