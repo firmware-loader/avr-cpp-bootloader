@@ -146,5 +146,28 @@ namespace utils {
     struct byte_type<8> {
         using value_type = uint64_t;
     };
+
+    template<typename T>
+    struct bit_count {};
+
+    template<>
+    struct bit_count<uint8_t> {
+        static constexpr auto value = 8;
+    };
+
+    template<>
+    struct bit_count<uint16_t> {
+        static constexpr auto value = 16;
+    };
+
+    template<>
+    struct bit_count<uint32_t > {
+        static constexpr auto value = 32;
+    };
+
+    template<>
+    struct bit_count<uint64_t > {
+        static constexpr auto value = 64;
+    };
 }
 
