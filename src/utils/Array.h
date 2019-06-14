@@ -26,19 +26,19 @@ namespace utils {
         }
 
         [[nodiscard]] constexpr T *begin() {
-            return mElement[0];
+            return mElement;
         }
 
         [[nodiscard]] constexpr T *begin() const {
-            return mElement[0];
+            return mElement;
         }
 
         [[nodiscard]] constexpr T *end() {
-            return mElement[N];
+            return mElement + N;
         }
 
         [[nodiscard]] constexpr T *end() const {
-            return mElement[N];
+            return mElement + N;
         }
 
         template<Endian endian>

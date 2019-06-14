@@ -129,7 +129,7 @@ namespace lib::software {
             return value;
         }
 
-        template<auto N> requires utils::is_arithmetic<decltype(N)>::value && N > 2
+        template<auto N> requires utils::is_arithmetic<decltype(N)>::value && N > 2 && N <= 255
         static utils::array<unsigned char, N> getBytes() {
             static utils::array<unsigned char, N> value;
             waitForSync();
