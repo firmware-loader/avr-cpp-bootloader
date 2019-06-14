@@ -25,14 +25,22 @@ int main() {
 
     uart::init<38400_baud>();
     softUart::init<384000_baud, 38400_baud>();
-    //bootloader::writeToFlash([]{return softUart::getBytes<8>(); });
-    bootloader::writeToFlash(softUart::getWord);
+    bootloader::writeToFlash([]{return softUart::getBytes<8>(); });
+    //bootloader::writeToFlash(softUart::getWord);
 
     while(true) {
         /*auto word = softUart::getBytes<8>();
-        uart::sendChar(word & 0xFF);
-        uart::sendChar((word >> 8u));
-        uart::sendChar((word >> 16u));
+        uart::sendChar(word[0]);
+        uart::sendChar(word[1]);
+        uart::sendChar(word[2]);
+        uart::sendChar(word[3]);
+        uart::sendChar(word[4]);
+        uart::sendChar(word[5]);
+        uart::sendChar(word[6]);
+        uart::sendChar(word[7]);*/
+        //uart::sendChar(word & 0xFF);
+        //uart::sendChar((word >> 8u));
+        /*uart::sendChar((word >> 16u));
         uart::sendChar((word >> 24u));
         uart::sendChar((word >> 32u));
         uart::sendChar((word >> 40u));

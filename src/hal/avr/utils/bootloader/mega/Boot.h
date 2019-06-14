@@ -55,14 +55,14 @@ namespace lib::avr::boot {
         }
 
         template<typename T>
-        requires utils::bit_count<decltype(T()())>::value > 16 && utils::bit_count<decltype(T()())>::value <= 64
+        requires decltype(T()())::static_size() % 2 == 0
+        //requires  static_cast<bool>(utils::is_bounded_array<decltype(T()())>()) && utils::bounded_array_size<decltype(T()())>::value % 2 == 0
         static auto writeToFlash(T readMethod) {
-            using bitCounter = utils::bit_count<decltype(T()())>;
-            constexpr auto byteCount = bitCounter::value / 8;
             DDRB |= (1 << PB0);
             PORTB |= (1 << PB0);
-            auto startAddress = readMethod();
-            auto dbg_size = readMethod();
+            constexpr auto arraySize = decltype(T()())::static_size();
+            uint8_t startAddress = readMethod()[0];
+            uint8_t dbg_size = readMethod()[0];
 
             uint8_t sreg = SREG;
             cli();
@@ -72,12 +72,12 @@ namespace lib::avr::boot {
 
                 boot_page_erase(startAddress);
                 boot_spm_busy_wait();
-                for (uint16_t i = 0; (i < SPM_PAGESIZE && dbg_size > 0); i += byteCount) {
-                    auto w = readMethod();
-                    for(uint8_t j = 0; j < byteCount; j+= 2) {
-                        boot_page_fill(startAddress + i + j, (w >> (j*8)));
+                for (uint16_t i = 0; (i < SPM_PAGESIZE && dbg_size > 0); i += arraySize) {
+                    auto v = readMethod();
+                    for(uint8_t j = 0; j < arraySize && dbg_size > 0; j+= 2) {
+                        boot_page_fill(startAddress + i + j, (v[j + 1] << 8) | v[j]);
+                        dbg_size -= 2;
                     }
-                    dbg_size -= byteCount;
                 }
 
                 boot_page_write(startAddress);

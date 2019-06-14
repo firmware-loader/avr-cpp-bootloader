@@ -4,7 +4,17 @@
 
 #pragma once
 
+#include <stddef.h>
+#include <stdint.h>
+
 namespace utils {
+    using size_t = size_t;
+
+    enum class Endian {
+        Little,
+        Big
+    };
+
     template<class T, T v>
     struct integral_constant {
         static constexpr T value = v;
@@ -126,6 +136,30 @@ namespace utils {
 
     template<auto N> requires is_arithmetic<decltype(N)>::value
     struct byte_type;
+
+    template<class T>
+    struct is_array : false_type {};
+
+    template<class T>
+    struct is_array<T[]> : true_type {};
+
+    template<class T, utils::size_t N>
+    struct is_array<T[N]> : true_type {};
+
+
+    template<class T>
+    struct is_bounded_array: false_type {};
+
+    template<class T, utils::size_t N>
+    struct is_bounded_array<T[N]> : true_type {};
+
+    template<class T>
+    struct bounded_array_size;
+
+    template<class T, utils::size_t N>
+    struct bounded_array_size<T[N]> {
+        static constexpr auto value = N;
+    };
 
     template<>
     struct byte_type<1>{
