@@ -7,6 +7,7 @@
 #include "SoftwareUart.h"
 #include "../../hal/concepts/Pin.h"
 #include "../Literals.h"
+#include "../../utils/Array.h"
 
 
 namespace lib::software {
@@ -126,7 +127,7 @@ namespace lib::software {
             return word;
         }
 
-        template<auto N> requires utils::is_arithmetic<decltype(N)>::value
+        template<auto N> requires utils::is_arithmetic<decltype(N)>::value && N <= 2
         static auto getBytes() {
             waitForSync();
             using type = utils::byte_type<N>::value_type;
@@ -136,6 +137,16 @@ namespace lib::software {
                 value |= static_cast<type>(receiveData()) << (8u * i);
             }
 
+            return value;
+        }
+
+        template<auto N> requires utils::is_arithmetic<decltype(N)>::value && N > 2 && N <= 255
+        static utils::array<unsigned char, N> getBytes() {
+            static utils::array<unsigned char, N> value;
+            waitForSync();
+            for(typename mcu::mem_width i=0; i < N; i++) {
+                value[i] = receiveData();;
+            }
             return value;
         }
     };

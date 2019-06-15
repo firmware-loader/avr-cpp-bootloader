@@ -12,7 +12,7 @@
 #include "../../../../../utils/TypeTraits.h"
 
 namespace lib::avr::boot {
-    template<typename mcu>
+    template<typename mcu>  requires mcu::family == MCUFamilies::AVR
     struct BootloaderHal {
     private:
         static constexpr void (*start)() = 0x0000;
@@ -55,8 +55,7 @@ namespace lib::avr::boot {
         }
 
         template<typename T>
-        requires decltype(T()())::static_size() % 2 == 0
-        //requires  static_cast<bool>(utils::is_bounded_array<decltype(T()())>()) && utils::bounded_array_size<decltype(T()())>::value % 2 == 0
+        requires decltype(T()())::static_size() % 2 == 0 && decltype(T()())::static_size() <= 255
         static auto writeToFlash(T readMethod) {
             DDRB |= (1 << PB0);
             PORTB |= (1 << PB0);

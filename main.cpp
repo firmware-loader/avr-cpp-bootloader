@@ -2,8 +2,6 @@
 #undef AVR
 #endif
 
-#include <avr/io.h>
-#include <util/delay.h>
 #include <stdlib.h>
 #include "src/hal/avr/mcus/mega328/Mega328.h"
 #include "src/abstraction/uart/AbstractUart.h"
@@ -23,12 +21,12 @@ int main() {
     using softUart = lib::software::SoftwareUart<mcu, 0, lib::software::SoftUartMethod::InlineAssembler>;
     using bootloader = lib::avr::boot::BootloaderHal<mcu>;
 
-    //uart::init<38400_baud>();
-    softUart::init<384000_baud, 38400_baud>();
+    uart::init<38400_baud>();
+    softUart::init<9600_baud, 9600_baud>();
     bootloader::writeToFlash([]{return softUart::getBytes<16>(); });
 
     while(true) {
-        /*auto word = softUart::getBytes<8>();
+        /*auto word = softUart::getBytes<16>();
         uart::sendChar(word[0]);
         uart::sendChar(word[1]);
         uart::sendChar(word[2]);
@@ -36,7 +34,15 @@ int main() {
         uart::sendChar(word[4]);
         uart::sendChar(word[5]);
         uart::sendChar(word[6]);
-        uart::sendChar(word[7]);*/
+        uart::sendChar(word[7]);
+        uart::sendChar(word[8]);
+        uart::sendChar(word[9]);
+        uart::sendChar(word[10]);
+        uart::sendChar(word[11]);
+        uart::sendChar(word[12]);
+        uart::sendChar(word[13]);
+        uart::sendChar(word[14]);
+        uart::sendChar(word[15]);*/
         //uart::sendChar(word & 0xFF);
         //uart::sendChar((word >> 8u));
         /*uart::sendChar((word >> 16u));
