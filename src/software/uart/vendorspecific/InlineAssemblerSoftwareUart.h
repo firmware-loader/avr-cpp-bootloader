@@ -130,14 +130,14 @@ namespace lib::software {
         }
 
         template<auto N> requires utils::is_arithmetic<decltype(N)>::value && N > 2 && N <= 255
-        static utils::array<unsigned char, N> getBytes() {
-            static utils::array<unsigned char, N> value;
+        static const utils::array<uint8_t, N>* getBytes() {
+            static utils::array<uint8_t, N> value;
             waitForSync();
             for(typename mcu::mem_width i=0; i < N; i++) {
                 receiveData();
                 value[i] = receiveBuffer;
             }
-            return value;
+            return &value;
         }
 
         template<auto minBaud, auto maxBaud>

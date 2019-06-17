@@ -15,7 +15,7 @@ namespace lib::avr::boot {
     template<typename mcu>  requires mcu::family == MCUFamilies::AVR
     struct BootloaderHal {
     private:
-        static constexpr void (*start)() = 0x0000;
+        [[noreturn]] static constexpr void (*start)() = 0x0000;
     public:
         template<typename T>
         requires static_cast<bool>(utils::is_same<decltype(T()()), uint16_t>()) // is this a bug in gcc?
@@ -55,13 +55,14 @@ namespace lib::avr::boot {
         }
 
         template<typename T>
-        requires decltype(T()())::static_size() % 2 == 0 && decltype(T()())::static_size() <= 255
+        requires static_cast<bool>(utils::is_pointer<decltype(T()())>()) && utils::remove_ptr<decltype(T()())>::type::static_size() % 2 == 0 &&
+        utils::remove_ptr<decltype(T()())>::type::static_size() <= 255
         static auto writeToFlash(T readMethod) {
             DDRB |= (1 << PB0);
             PORTB |= (1 << PB0);
-            constexpr auto arraySize = decltype(T()())::static_size();
-            uint8_t startAddress = readMethod()[0];
-            uint8_t dbg_size = readMethod()[0];
+            constexpr auto arraySize = utils::remove_ptr<decltype(T()())>::type::static_size();
+            uint8_t startAddress = (*readMethod())[0];//static_cast<uint16_t>((*readMethod())[0] << 8u) | (*readMethod())[1];
+            uint8_t dbg_size = (*readMethod())[0];//static_cast<uint16_t>((*readMethod())[0] << 8u) | (*readMethod())[1];
 
             uint8_t sreg = SREG;
             cli();
@@ -72,7 +73,7 @@ namespace lib::avr::boot {
                 boot_page_erase(startAddress);
                 boot_spm_busy_wait();
                 for (uint16_t i = 0; (i < SPM_PAGESIZE && dbg_size > 0); i += arraySize) {
-                    auto v = readMethod();
+                    const auto v = *readMethod();
                     for(uint8_t j = 0; j < arraySize && dbg_size > 0; j+= 2) {
                         boot_page_fill(startAddress + i + j, (v[j + 1] << 8) | v[j]);
                         dbg_size -= 2;

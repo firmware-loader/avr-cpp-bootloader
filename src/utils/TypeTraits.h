@@ -61,6 +61,27 @@ namespace utils {
         typedef typename remove_volatile<typename remove_const<T>::type>::type type;
     };
 
+    template<typename T>
+    struct remove_ptr {
+        using type = T;
+    };
+
+    template<typename T>
+    struct remove_ptr<T*> {
+        using type = T;
+    };
+
+    template<typename T>
+    struct remove_ptr<const T*> {
+        using type = T;
+    };
+
+    template<typename T>
+    struct is_pointer : false_type {};
+
+    template<typename T>
+    struct is_pointer<T*>  : true_type {};
+
     template<typename>
     struct is_integral_base : false_type {
     };

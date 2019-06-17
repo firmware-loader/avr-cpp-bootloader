@@ -13,7 +13,7 @@ namespace utils {
             return mElement[position];
         }
 
-        [[nodiscard]] constexpr T& operator[](auto position) const {
+        [[nodiscard]] constexpr const T& operator[](auto position) const {
             return mElement[position];
         }
 
