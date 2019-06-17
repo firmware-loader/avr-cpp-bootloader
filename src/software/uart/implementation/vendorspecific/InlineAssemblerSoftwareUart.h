@@ -6,7 +6,7 @@
 
 #include "../SoftwareUart.h"
 #include "external/Sync.h"
-#include "../../../utils/Array.h"
+#include "../../../../utils/Array.h"
 
 namespace lib::software {
     extern "C" {
@@ -21,7 +21,7 @@ namespace lib::software {
         using selectedPin = pin::Pin<mcu, pinNumber>::value;
         //https://rn-wissen.de/wiki/index.php?title=Inline-Assembler_in_avr-gcc
         //We can't have a return value here, as it'll manipulate the timings
-        static void receiveData() {
+        static void asmReceiveData() {
             asm volatile(R"(
                 rjmp receiveByte
                 WaitBitcell:
@@ -54,6 +54,10 @@ namespace lib::software {
             : "r20", "r21");
         }
 
+
+
+
+    public:
         static auto waitForSync() {
             asm volatile(R"(
                 rjmp waitForSyncASM
@@ -93,50 +97,9 @@ namespace lib::software {
             : "r20", "r21");
         }
 
-        [[nodiscard]] static auto receiveDataWithReturn() {
-            receiveData();
+        [[nodiscard]] static auto receiveData() {
+            asmReceiveData();
             return receiveBuffer;
-        }
-    public:
-        static auto syncAndReceiveBytes(uint8_t* input, uint8_t elements) {
-            waitForSync();
-            for(uint8_t i=0; i < elements; i++) {
-                receiveData();
-                input[i] = receiveBuffer;
-            }
-            return input;
-        }
-
-        static uint16_t getWord() {
-            waitForSync();
-            return receiveDataWithReturn() | (static_cast<uint16_t>(receiveDataWithReturn()) << 8u);
-        }
-
-        template<auto N>
-        [[nodiscard]] static auto  getBytes()
-        requires utils::is_arithmetic<decltype(N)>::value && N <= 2 {
-            using type = utils::byte_type<N>::value_type;
-            type value = 0;
-            waitForSync();
-
-
-            for(typename mcu::mem_width i=0; i < N; i++) {
-                receiveData();
-                value |= static_cast<type>(receiveBuffer) << (8u * i);
-            }
-            return value;
-        }
-
-        template<auto N>
-        [[nodiscard]] static const utils::array<typename mcu::mem_width, N>* getBytes()
-        requires utils::is_arithmetic<decltype(N)>::value && N > 2 && N <= 255 {
-            static utils::array<typename mcu::mem_width, N> value;
-            waitForSync();
-            for(typename mcu::mem_width i=0; i < N; i++) {
-                receiveData();
-                value[i] = receiveBuffer;
-            }
-            return &value;
         }
 
         template<auto minBaud, auto maxBaud>

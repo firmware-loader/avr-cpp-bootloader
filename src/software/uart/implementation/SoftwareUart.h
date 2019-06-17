@@ -5,12 +5,12 @@
 #pragma once
 
 #include <avr/io.h>
-#include "../../abstraction/pins/PinControl.h"
-#include "../../abstraction/timer/AbstractTimer.h"
-#include "../../utils/custom_limits.h"
-#include "../../utils/TypeTraits.h"
-#include "../../concepts/TypeCheck.h"
-#include "../../utils/Utility.h"
+#include "../../../abstraction/pins/PinControl.h"
+#include "../../../abstraction/timer/AbstractTimer.h"
+#include "../../../utils/custom_limits.h"
+#include "../../../utils/TypeTraits.h"
+#include "../../../concepts/TypeCheck.h"
+#include "../../../utils/Utility.h"
 
 namespace lib::software {
     enum class Sync : uint8_t {

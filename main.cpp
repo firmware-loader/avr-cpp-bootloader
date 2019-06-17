@@ -5,11 +5,9 @@
 #include <stdlib.h>
 #include "src/hal/avr/mcus/mega328/Mega328.h"
 #include "src/abstraction/uart/AbstractUart.h"
-#include "src/software/uart/SoftwareUart.h"
-#include "src/software/uart/TimerSoftwareUart.h"
-#include "src/software/uart/vendorspecific/InlineAssemblerSoftwareUart.h"
-#include "src/software/uart/vendorspecific/AssemblerSoftwareUart.h"
-#include "src/software/uart/vendorspecific/external/Sync.h"
+#include "src/software/uart/implementation/SoftwareUart.h"
+#include "src/software/uart/implementation/TimerSoftwareUart.h"
+#include "src/software/uart/AbstractSoftwareUart.h"
 #include "src/hal/avr/utils/bootloader/mega/Boot.h"
 
 
@@ -17,8 +15,9 @@ using mcu = lib::avr::ATMega328;
 
 int main() {
     using namespace lib::software::literals;
-    using uart = lib::software::Uart<mcu>;
-    using softUart = lib::software::SoftwareUart<mcu, 0, lib::software::SoftUartMethod::InlineAssembler>;
+    //using uart = lib::software::Uart<mcu>;
+    //using softUart = lib::software::SoftwareUart<mcu, 0, lib::software::SoftUartMethod::InlineAssembler>;
+    using softUart = lib::software::AbstractSoftwareUart<mcu, 0, lib::software::SoftUartMethod::InlineAssembler>;
     using bootloader = lib::avr::boot::BootloaderHal<mcu>;
 
     //uart::init<38400_baud>();

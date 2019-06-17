@@ -61,8 +61,8 @@ namespace lib::avr::boot {
             DDRB |= (1 << PB0);
             PORTB |= (1 << PB0);
             constexpr auto arraySize = utils::remove_ptr<decltype(DF()())>::type::static_size();
-            uint16_t startAddress = metadataMethod();//(*readMethod())[0];//static_cast<uint16_t>((*readMethod())[0] << 8u) | (*readMethod())[1];
-            uint16_t dbg_size = metadataMethod();//(*readMethod())[0];//static_cast<uint16_t>((*readMethod())[0] << 8u) | (*readMethod())[1];
+            uint16_t startAddress = metadataMethod();
+            uint16_t dbg_size = metadataMethod();
 
             uint8_t sreg = SREG;
             cli();
