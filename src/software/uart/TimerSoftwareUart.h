@@ -38,15 +38,15 @@ namespace lib::software {
 
         static void waitForSync() {
             while (true) {
-                while (isHigh()) {}           //skip first high
+                do {} while (isHigh());            //skip first high
 
                 auto startValue = timer::readValue();
-                while (!isHigh()) {         //measure first low time
-                }
+                while (!isHigh()) { }        //measure first low time
+
                 auto endValue = timer::readValue();
                 bitcellLength = calculateTime(startValue, endValue);
 
-                while (isHigh()) {}         //wait for 2nd low
+                do {} while (isHigh());         //wait for 2nd low
 
                 startValue = timer::readValue();
                 while (!isHigh()) {
@@ -141,13 +141,13 @@ namespace lib::software {
         }
 
         template<auto N> requires utils::is_arithmetic<decltype(N)>::value && N > 2 && N <= 255
-        static utils::array<unsigned char, N> getBytes() {
+        static utils::array<unsigned char, N>* getBytes() {
             static utils::array<unsigned char, N> value;
             waitForSync();
             for(typename mcu::mem_width i=0; i < N; i++) {
                 value[i] = receiveData();;
             }
-            return value;
+            return &value;
         }
     };
 

@@ -130,8 +130,8 @@ namespace lib::software {
         }
 
         template<auto N> requires utils::is_arithmetic<decltype(N)>::value && N > 2 && N <= 255
-        static const utils::array<uint8_t, N>* getBytes() {
-            static utils::array<uint8_t, N> value;
+        static const utils::array<typename mcu::mem_width, N>* getBytes() {
+            static utils::array<typename mcu::mem_width, N> value;
             waitForSync();
             for(typename mcu::mem_width i=0; i < N; i++) {
                 receiveData();

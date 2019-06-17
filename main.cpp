@@ -23,7 +23,7 @@ int main() {
 
     //uart::init<38400_baud>();
     softUart::init<9600_baud, 9600_baud>();
-    bootloader::writeToFlash([]{return softUart::getBytes<16>(); });
+    bootloader::writeToFlash([]{return softUart::getBytes<2>(); }, []{return softUart::getBytes<16>(); });
 
     //while(true) {
         /*auto word = softUart::getBytes<16>();
