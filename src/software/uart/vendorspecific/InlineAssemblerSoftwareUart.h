@@ -92,6 +92,11 @@ namespace lib::software {
             : [pin] "I" (_SFR_IO_ADDR(PIND)), [bit] "n" (RXBIT)
             : "r20", "r21");
         }
+
+        [[nodiscard]] static auto receiveDataWithReturn() {
+            receiveData();
+            return receiveBuffer;
+        }
     public:
         static auto syncAndReceiveBytes(uint8_t* input, uint8_t elements) {
             waitForSync();
@@ -102,21 +107,14 @@ namespace lib::software {
             return input;
         }
 
-        static auto getWord() {
-            uint16_t word = 0;
+        static uint16_t getWord() {
             waitForSync();
-
-            receiveData();
-            word = receiveBuffer;
-
-            receiveData();
-            word |= (uint16_t)receiveBuffer << 8u;
-
-            return word;
+            return receiveDataWithReturn() | (static_cast<uint16_t>(receiveDataWithReturn()) << 8u);
         }
 
-        template<auto N> requires utils::is_arithmetic<decltype(N)>::value && N <= 2
-        static auto  getBytes() {
+        template<auto N>
+        [[nodiscard]] static auto  getBytes()
+        requires utils::is_arithmetic<decltype(N)>::value && N <= 2 {
             using type = utils::byte_type<N>::value_type;
             type value = 0;
             waitForSync();
@@ -129,8 +127,9 @@ namespace lib::software {
             return value;
         }
 
-        template<auto N> requires utils::is_arithmetic<decltype(N)>::value && N > 2 && N <= 255
-        static const utils::array<typename mcu::mem_width, N>* getBytes() {
+        template<auto N>
+        [[nodiscard]] static const utils::array<typename mcu::mem_width, N>* getBytes()
+        requires utils::is_arithmetic<decltype(N)>::value && N > 2 && N <= 255 {
             static utils::array<typename mcu::mem_width, N> value;
             waitForSync();
             for(typename mcu::mem_width i=0; i < N; i++) {

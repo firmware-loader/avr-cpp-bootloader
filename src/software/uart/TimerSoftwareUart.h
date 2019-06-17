@@ -38,7 +38,7 @@ namespace lib::software {
 
         static void waitForSync() {
             while (true) {
-                do {} while (isHigh());            //skip first high
+               while (isHigh()) {};            //skip first high
 
                 auto startValue = timer::readValue();
                 while (!isHigh()) { }        //measure first low time
@@ -46,7 +46,7 @@ namespace lib::software {
                 auto endValue = timer::readValue();
                 bitcellLength = calculateTime(startValue, endValue);
 
-                do {} while (isHigh());         //wait for 2nd low
+                while (isHigh()) {};         //wait for 2nd low
 
                 startValue = timer::readValue();
                 while (!isHigh()) {
@@ -71,7 +71,7 @@ namespace lib::software {
             while (isHigh()) {}                   // skip everything before start (this will keep the sync)
             for (; i < 9; i++) {                  // 8-N-1 (will overwrite start bit)
                 auto startValue = timer::readValue();
-                for(int tmp = bitcellLength / 2; tmp > 0; tmp--) { asm(""); }
+                for(int tmp = bitcellLength / 2; tmp > 0; tmp--) { asm volatile(""); }
                 buffer /= 2;                    // lshift
                 if (isHigh()) {
                     buffer |= (1u << 7u);
@@ -115,16 +115,9 @@ namespace lib::software {
             pin::setInputState<pin::Pin<mcu, pinNumber>, pin::InputState::PULLUP>();
         }
 
-
-
         static auto getWord() {
-            uint16_t word = 0;
             waitForSync();
-
-            word = receiveData();
-            word |= (uint16_t)receiveData() << 8u;
-
-            return word;
+            return ((uint16_t)receiveData() << 8u) | receiveData();
         }
 
         template<auto N> requires utils::is_arithmetic<decltype(N)>::value && N <= 2
@@ -141,8 +134,8 @@ namespace lib::software {
         }
 
         template<auto N> requires utils::is_arithmetic<decltype(N)>::value && N > 2 && N <= 255
-        static utils::array<unsigned char, N>* getBytes() {
-            static utils::array<unsigned char, N> value;
+        static utils::array<typename mcu::mem_width, N>* getBytes() {
+            static utils::array<typename mcu::mem_width, N> value;
             waitForSync();
             for(typename mcu::mem_width i=0; i < N; i++) {
                 value[i] = receiveData();;
