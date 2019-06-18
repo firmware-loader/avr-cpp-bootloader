@@ -6,7 +6,7 @@
 #include "TypeTraits.h"
 
 namespace utils {
-    template<typename T, utils::size_t N> requires sizeof(T) == 1
+    template<typename T, utils::size_t N>
     class array {
     public:
         [[nodiscard]] constexpr T& operator[](auto position) {
@@ -42,7 +42,7 @@ namespace utils {
         }
 
         template<Endian endian>
-        [[nodiscard]] constexpr utils::byte_type<N> makeNumber() {
+        [[nodiscard]] constexpr utils::byte_type<N> makeNumber()  requires sizeof(T) == 1 {
             utils::byte_type<N> buffer;
             for(uint8_t i=0; i < N; i++) {
                 if constexpr(endian == Endian::Little)

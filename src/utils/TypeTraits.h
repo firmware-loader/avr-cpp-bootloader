@@ -182,6 +182,12 @@ namespace utils {
         static constexpr auto value = N;
     };
 
+    template<bool B, class T, class F>
+    struct conditional { typedef T type; };
+
+    template<class T, class F>
+    struct conditional<false, T, F> { typedef F type; };
+
     template<>
     struct byte_type<1>{
         using value_type = uint8_t;
@@ -223,6 +229,23 @@ namespace utils {
     template<>
     struct bit_count<uint64_t > {
         static constexpr auto value = 64;
+    };
+
+    template <typename... TL>
+    struct max_type;
+
+    template <typename T>
+    struct max_type<T> {
+        using type = T;
+    };
+
+    template <typename T, typename U, typename... TL>
+    struct max_type<T, U, TL...>
+    {
+        using type = typename max_type<typename conditional<
+                (sizeof(U) <= sizeof(T)), T, U
+            >::type, TL...
+        >::type;
     };
 }
 

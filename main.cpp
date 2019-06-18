@@ -17,7 +17,7 @@ int main() {
     using namespace lib::software::literals;
     //using uart = lib::software::Uart<mcu>;
     //using softUart = lib::software::SoftwareUart<mcu, 0, lib::software::SoftUartMethod::InlineAssembler>;
-    using softUart = lib::software::AbstractSoftwareUart<mcu, 0, lib::software::SoftUartMethod::InlineAssembler>;
+    using softUart = lib::software::AbstractSoftwareUart<mcu, 0, lib::software::SoftUartMethod::TimingBased>;
     using bootloader = lib::avr::boot::BootloaderHal<mcu>;
 
     //uart::init<38400_baud>();

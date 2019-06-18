@@ -21,7 +21,8 @@ namespace lib::software {
     enum class SoftUartMethod : uint8_t {
         Timer,
         Assembler,
-        InlineAssembler
+        InlineAssembler,
+        TimingBased
     };
 
     template<typename mcu, auto pinNumber, SoftUartMethod method>

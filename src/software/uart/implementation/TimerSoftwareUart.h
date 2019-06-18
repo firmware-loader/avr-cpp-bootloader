@@ -7,7 +7,6 @@
 #include "SoftwareUart.h"
 #include "../../../hal/concepts/Pin.h"
 #include "../../Literals.h"
-#include "../../../utils/Array.h"
 
 
 namespace lib::software {
@@ -15,7 +14,6 @@ namespace lib::software {
         requires pin::isAbstractPin<pin::Pin<mcu, pinNumber>>
     class SoftwareUart<mcu, pinNumber, SoftUartMethod::Timer> {
     private:
-
         static int16_t bitcellLength;
         using timer = AbstractTimer<mcu>;
         static constexpr auto praeamble = 0x55;

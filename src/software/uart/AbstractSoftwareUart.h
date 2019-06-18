@@ -5,6 +5,8 @@
 #pragma once
 
 #include "implementation/SoftwareUart.h"
+#include "implementation/TimingBasedUart.h"
+#include "implementation/TimerSoftwareUart.h"
 #include "implementation/vendorspecific/InlineAssemblerSoftwareUart.h"
 #include "implementation/vendorspecific/AssemblerSoftwareUart.h"
 #include "implementation/vendorspecific/external/Sync.h"
