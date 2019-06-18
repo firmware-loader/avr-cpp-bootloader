@@ -54,9 +54,6 @@ namespace lib::software {
             : "r20", "r21");
         }
 
-
-
-
     public:
         static auto waitForSync() {
             asm volatile(R"(

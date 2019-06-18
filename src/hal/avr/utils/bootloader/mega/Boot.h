@@ -58,8 +58,6 @@ namespace lib::avr::boot {
         requires static_cast<bool>(utils::is_pointer<decltype(DF()())>()) && utils::remove_ptr<decltype(DF()())>::type::static_size() % 2 == 0 &&
         utils::remove_ptr<decltype(DF()())>::type::static_size() <= 255 && static_cast<bool>(utils::is_same<decltype(MF()()), uint16_t>())
         static auto writeToFlash(MF metadataMethod, DF readMethod) {
-            DDRB |= (1 << PB0);
-            PORTB |= (1 << PB0);
             constexpr auto arraySize = utils::remove_ptr<decltype(DF()())>::type::static_size();
             uint16_t startAddress = metadataMethod();
             uint16_t dbg_size = metadataMethod();
@@ -91,10 +89,6 @@ namespace lib::avr::boot {
 
             SREG = sreg;
             startUserProgram();
-        }
-
-        static auto flushData() {
-
         }
 
         static constexpr auto startUserProgram() {

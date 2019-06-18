@@ -8,12 +8,14 @@
 #include "implementation/vendorspecific/InlineAssemblerSoftwareUart.h"
 #include "implementation/vendorspecific/AssemblerSoftwareUart.h"
 #include "implementation/vendorspecific/external/Sync.h"
+#include "../../utils/custom_limits.h"
 
 namespace lib::software {
     template<typename mcu, auto pinNumber, SoftUartMethod method>
     class AbstractSoftwareUart {
     private:
         using softUart = SoftwareUart<mcu, pinNumber, method>;
+        using selectedPin = pin::Pin<mcu, pinNumber>::value;
     public:
         static uint16_t getWord() {
             softUart::waitForSync();
@@ -22,7 +24,6 @@ namespace lib::software {
 
         template<auto N>
         [[nodiscard]] static auto getBytes()
-
         requires utils::is_arithmetic<decltype(N)>::value
         && N <= 2 {
             using type = utils::byte_type<N>::value_type;
@@ -38,7 +39,6 @@ namespace lib::software {
 
         template<auto N>
         [[nodiscard]] static const utils::array<typename mcu::mem_width, N> *getBytes()
-
         requires utils::is_arithmetic<decltype(N)>::value
         && N > 2 && N <= 255 {
             static utils::array<typename mcu::mem_width, N> value;
@@ -52,6 +52,18 @@ namespace lib::software {
         template<auto minBaud, auto maxBaud>
         static constexpr void init() {
              softUart::template init<minBaud, maxBaud>();
+        }
+
+        template<typename T> requires utils::is_arithmetic<T>::value
+        static bool gotSignalBeforeTimout() {
+            using pin = pin::Pin<mcu, 0>::value;
+            for(T i = 0; i < utils::numeric_limits<T>::max(); i++) { // utils::numeric_limits<T>::max()
+                asm volatile("");
+                if(pin::get() == 0) {
+                    return true;
+                }
+            }
+            return false;
         }
     };
 }

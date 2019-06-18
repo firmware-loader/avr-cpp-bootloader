@@ -22,7 +22,11 @@ int main() {
 
     //uart::init<38400_baud>();
     softUart::init<9600_baud, 9600_baud>();
-    bootloader::writeToFlash(softUart::getWord, []{return softUart::getBytes<16>(); });
+    if((softUart::gotSignalBeforeTimout<uint16_t>())) {
+        bootloader::writeToFlash(softUart::getWord, [] { return softUart::getBytes<16>(); });
+    } else {
+        bootloader::startUserProgram();
+    }
 
     //while(true) {
     /*    auto meta1 = softUart::getWord();
