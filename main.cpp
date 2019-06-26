@@ -31,12 +31,12 @@ int main() {
     }*/
 
     //while(true) {
-        auto meta1 = softUart::getWord();
+    /*    auto meta1 = softUart::getWord();
     uart::sendChar(meta1 & 0xFF);
     uart::sendChar((meta1 >> 8u));
         auto meta2 = softUart::getWord();
     uart::sendChar(meta2 & 0xFF);
-    uart::sendChar((meta2 >> 8u));
+    uart::sendChar((meta2 >> 8u));*/
 
     /*const auto& word = softUart::getBytes<16>();
     uart::sendChar((*word)[0]);

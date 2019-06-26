@@ -54,28 +54,25 @@ STOP_MEASUREMENT
             while (receiveData() != praeamble) {}
         }
 
-        /*static mcu::mem_width receiveData() {
+        static mcu::mem_width receiveData() {
             uint8_t buffer = 0;
-            uint8_t i = 0;                      // this position is mandatory
-            uint16_t localCounter = mCounter;
-            uint16_t tmpCounter = localCounter / 2u;
             while (isHigh()) {}                   // skip everything before start (this will keep the sync)
             START_MEASUREMENT
-            for(uint16_t j = tmpCounter; j != 0; j-=TIMING_CONSTANT_IN_LOOP) { asm volatile(""); }
+            for(uint16_t j =  0; j < mCounter / 2u; j+=7) { asm volatile(""); }
             STOP_MEASUREMENT
-            for (; i < 8; i++) {                  // 8-N-1 (will overwrite start bit)
+            for (uint8_t i = 9; i != 0; i--) {                  // 8-N-1 (will overwrite start bit)
                 buffer /= 2;                    // lshift
                 if (isHigh()) {
                     buffer |= (1u << 7u);
                 }
                 START_MEASUREMENT
-                for(uint16_t j = localCounter; j != 0; j-=TIMING_CONSTANT_IN_LOOP) { asm volatile(""); }
+                for(uint16_t j = 0; j < mCounter; j+=7) { asm volatile(""); }
                 STOP_MEASUREMENT
             }
             while (!isHigh()) {}                  // skip last low (stop bit)
             return buffer;
-        }*/
-        static void asmReceiveData() {
+        }
+        /*static void asmReceiveData() {
             asm volatile(R"(
                 rjmp receiveByte
                 WaitBitcell:
@@ -111,7 +108,7 @@ STOP_MEASUREMENT
         [[nodiscard]] static auto receiveData() {
             asmReceiveData();
             return receiveBuffer2;
-        }
+        }*/
     };
 
 
