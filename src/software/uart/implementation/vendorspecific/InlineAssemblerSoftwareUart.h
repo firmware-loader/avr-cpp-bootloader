@@ -11,7 +11,7 @@
 namespace lib::software {
     extern "C" {
     volatile uint8_t receiveBuffer;
-    volatile uint16_t counterBuffer = 0;
+    volatile int16_t counterBuffer = 0;
     }
     template<typename mcu, auto pinNumber>
     requires mcu::family == MCUFamilies::AVR && pin::isAbstractPin<pin::Pin<mcu, pinNumber>>

@@ -8,11 +8,16 @@
 #include "SoftwareUart.h"
 
 namespace lib::software {
+    extern "C" {
+        volatile uint8_t receiveBuffer2;
+    }
+
     template<typename mcu, auto pinNumber>
     requires pin::isAbstractPin<pin::Pin < mcu, pinNumber>>
     class SoftwareUart<mcu, pinNumber, SoftUartMethod::TimingBased> {
     private:
-        static typename utils::max_type<typename mcu::mem_width, int16_t>::type mCounter;
+        static constexpr auto praeamble = 0x55;
+        static typename utils::max_type<typename mcu::mem_width, uint16_t>::type mCounter;
 
         static constexpr auto isHigh() {
             using pin = pin::Pin<mcu, 0>::value;
@@ -24,21 +29,20 @@ namespace lib::software {
         }
 
         static auto waitForSync() {
-            auto tmp = 0;
+            decltype(mCounter) tmp = 0;
             while (true) {
-                tmp = 0;
                 while (isHigh()) {}           //skip first high
-START_MEASUREMENT(1)
+START_MEASUREMENT
                 do {         //measure first low time
-                    tmp += TIMING_CONSTANT(1);
+                    tmp += 5;
                 }  while (!isHigh());
-STOP_MEASUREMENT(1)
+STOP_MEASUREMENT
                 while (isHigh()) {}         //wait for 2nd low
-START_MEASUREMENT(2)
+START_MEASUREMENT
                 do {
-                    tmp -= TIMING_CONSTANT(2);
+                    tmp -= 5;
                 }  while (!isHigh());
-STOP_MEASUREMENT(2)
+STOP_MEASUREMENT
                 if (tmp < 0) {
                     while (isHigh()) {}
                     while (!isHigh()) {}      //repeat until in sync
@@ -47,15 +51,73 @@ STOP_MEASUREMENT(2)
                 }
             }
             mCounter = tmp;
+            while (receiveData() != praeamble) {}
         }
 
-        static mcu::mem_width receiveData() {
-            return 0;
+        /*static mcu::mem_width receiveData() {
+            uint8_t buffer = 0;
+            uint8_t i = 0;                      // this position is mandatory
+            uint16_t localCounter = mCounter;
+            uint16_t tmpCounter = localCounter / 2u;
+            while (isHigh()) {}                   // skip everything before start (this will keep the sync)
+            START_MEASUREMENT
+            for(uint16_t j = tmpCounter; j != 0; j-=TIMING_CONSTANT_IN_LOOP) { asm volatile(""); }
+            STOP_MEASUREMENT
+            for (; i < 8; i++) {                  // 8-N-1 (will overwrite start bit)
+                buffer /= 2;                    // lshift
+                if (isHigh()) {
+                    buffer |= (1u << 7u);
+                }
+                START_MEASUREMENT
+                for(uint16_t j = localCounter; j != 0; j-=TIMING_CONSTANT_IN_LOOP) { asm volatile(""); }
+                STOP_MEASUREMENT
+            }
+            while (!isHigh()) {}                  // skip last low (stop bit)
+            return buffer;
+        }*/
+        static void asmReceiveData() {
+            asm volatile(R"(
+                rjmp receiveByte
+                WaitBitcell:
+                        movw xl, %A[cb]
+                wbc0:
+                        sbiw xl, 4
+                        brcc wbc0
+                wbcx:
+                        sts %[rb], r20
+                        ret
+                receiveByte:
+                        sbic %[pin],%[bit]
+                        rjmp receiveByte
+                        ldi r21, lo8(8)
+                CL9:
+                        movw xl, %A[cb]
+                        lsr xh
+                        ror xl
+                        ldi r21, 9
+                rxb3:
+                        rcall WaitBitcell
+                        lsr r20
+                        sbic %[pin],%[bit]
+                        ori r20, 128
+                        dec r21
+                        brne rxb3
+            )"
+            : [rb] "=m" (receiveBuffer2)
+            : [pin] "I" (_SFR_IO_ADDR(PIND)), [bit] "n" (0), [cb] "w" (mCounter)
+            : "r20", "r21");
+        }
+
+        [[nodiscard]] static auto receiveData() {
+            asmReceiveData();
+            return receiveBuffer2;
         }
     };
 
+
+
     template<typename mcu, auto pinNumber>
-    typename utils::max_type<typename mcu::mem_width, int16_t>::type SoftwareUart<mcu, pinNumber, SoftUartMethod::TimingBased>::mCounter = 0;
+    typename utils::max_type<typename mcu::mem_width, uint16_t>::type SoftwareUart<mcu, pinNumber, SoftUartMethod::TimingBased>::mCounter = 0;
 }
 
 

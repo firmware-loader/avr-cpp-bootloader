@@ -15,26 +15,28 @@ using mcu = lib::avr::ATMega328;
 
 int main() {
     using namespace lib::software::literals;
-    //using uart = lib::software::Uart<mcu>;
+    using uart = lib::software::Uart<mcu>;
     //using softUart = lib::software::SoftwareUart<mcu, 0, lib::software::SoftUartMethod::InlineAssembler>;
     using softUart = lib::software::AbstractSoftwareUart<mcu, 0, lib::software::SoftUartMethod::TimingBased>;
     using bootloader = lib::avr::boot::BootloaderHal<mcu>;
 
-    //uart::init<38400_baud>();
+    DDRB |= (1 << PB0);
+    PORTB |= (1 << PB0);
+    uart::init<38400_baud>();
     softUart::init<9600_baud, 9600_baud>();
-    if((softUart::gotSignalBeforeTimout<uint16_t>())) {
+    /*if((softUart::gotSignalBeforeTimout<uint16_t>())) {
         bootloader::writeToFlash(softUart::getWord, [] { return softUart::getBytes<16>(); });
     } else {
         bootloader::startUserProgram();
-    }
+    }*/
 
     //while(true) {
-    /*    auto meta1 = softUart::getWord();
+        auto meta1 = softUart::getWord();
     uart::sendChar(meta1 & 0xFF);
     uart::sendChar((meta1 >> 8u));
         auto meta2 = softUart::getWord();
     uart::sendChar(meta2 & 0xFF);
-    uart::sendChar((meta2 >> 8u));*/
+    uart::sendChar((meta2 >> 8u));
 
     /*const auto& word = softUart::getBytes<16>();
     uart::sendChar((*word)[0]);
