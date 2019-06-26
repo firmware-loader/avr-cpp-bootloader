@@ -8,10 +8,6 @@
 #include "SoftwareUart.h"
 
 namespace lib::software {
-    extern "C" {
-        volatile uint8_t receiveBuffer2;
-    }
-
     template<typename mcu, auto pinNumber>
     requires pin::isAbstractPin<pin::Pin < mcu, pinNumber>>
     class SoftwareUart<mcu, pinNumber, SoftUartMethod::TimingBased> {
@@ -72,43 +68,6 @@ STOP_MEASUREMENT
             while (!isHigh()) {}                  // skip last low (stop bit)
             return buffer;
         }
-        /*static void asmReceiveData() {
-            asm volatile(R"(
-                rjmp receiveByte
-                WaitBitcell:
-                        movw xl, %A[cb]
-                wbc0:
-                        sbiw xl, 4
-                        brcc wbc0
-                wbcx:
-                        sts %[rb], r20
-                        ret
-                receiveByte:
-                        sbic %[pin],%[bit]
-                        rjmp receiveByte
-                        ldi r21, lo8(8)
-                CL9:
-                        movw xl, %A[cb]
-                        lsr xh
-                        ror xl
-                        ldi r21, 9
-                rxb3:
-                        rcall WaitBitcell
-                        lsr r20
-                        sbic %[pin],%[bit]
-                        ori r20, 128
-                        dec r21
-                        brne rxb3
-            )"
-            : [rb] "=m" (receiveBuffer2)
-            : [pin] "I" (_SFR_IO_ADDR(PIND)), [bit] "n" (0), [cb] "w" (mCounter)
-            : "r20", "r21");
-        }
-
-        [[nodiscard]] static auto receiveData() {
-            asmReceiveData();
-            return receiveBuffer2;
-        }*/
     };
 
 

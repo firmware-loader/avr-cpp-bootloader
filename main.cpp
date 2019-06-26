@@ -15,20 +15,20 @@ using mcu = lib::avr::ATMega328;
 
 int main() {
     using namespace lib::software::literals;
-    using uart = lib::software::Uart<mcu>;
+    //using uart = lib::software::Uart<mcu>;
     //using softUart = lib::software::SoftwareUart<mcu, 0, lib::software::SoftUartMethod::InlineAssembler>;
     using softUart = lib::software::AbstractSoftwareUart<mcu, 0, lib::software::SoftUartMethod::TimingBased>;
     using bootloader = lib::avr::boot::BootloaderHal<mcu>;
 
-    DDRB |= (1 << PB0);
-    PORTB |= (1 << PB0);
-    uart::init<38400_baud>();
+    //uart::init<38400_baud>();
     softUart::init<9600_baud, 9600_baud>();
-    /*if((softUart::gotSignalBeforeTimout<uint16_t>())) {
+    //DDRB |= (1 << PB0);
+    //PORTB |= (1 << PB0);
+    if((softUart::gotSignalBeforeTimout<uint16_t>())) {
         bootloader::writeToFlash(softUart::getWord, [] { return softUart::getBytes<16>(); });
     } else {
         bootloader::startUserProgram();
-    }*/
+    }
 
     //while(true) {
     /*    auto meta1 = softUart::getWord();
