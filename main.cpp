@@ -22,8 +22,6 @@ int main() {
 
     //uart::init<38400_baud>();
     softUart::init<9600_baud, 9600_baud>();
-    //DDRB |= (1 << PB0);
-    //PORTB |= (1 << PB0);
     if((softUart::gotSignalBeforeTimout<uint16_t>())) {
         bootloader::writeToFlash(softUart::getWord, [] { return softUart::getBytes<16>(); });
     } else {
