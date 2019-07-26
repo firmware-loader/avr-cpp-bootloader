@@ -16,7 +16,7 @@ namespace lib::software {
         static typename utils::max_type<typename mcu::mem_width, uint16_t>::type mCounter;
 
         static constexpr auto isHigh() {
-            using pin = pin::Pin<mcu, 0>::value;
+            using pin = pin::Pin<mcu, pinNumber>::value;
             return (pin::get() != 0);
         }
     public:
@@ -30,13 +30,13 @@ namespace lib::software {
                 while (isHigh()) {}           //skip first high
 START_MEASUREMENT
                 do {         //measure first low time
-                    tmp += 5;
+                    tmp += TIMING_CONSTANT_1;
                 }  while (!isHigh());
 STOP_MEASUREMENT
                 while (isHigh()) {}         //wait for 2nd low
 START_MEASUREMENT
                 do {
-                    tmp -= 5;
+                    tmp -= TIMING_CONSTANT_1;
                 }  while (!isHigh());
 STOP_MEASUREMENT
                 if (tmp < 0) {
@@ -52,9 +52,11 @@ STOP_MEASUREMENT
 
         static mcu::mem_width receiveData() {
             uint8_t buffer = 0;
+            uint16_t j = 0;
+            uint16_t mCounterTmp = mCounter;
             while (isHigh()) {}                   // skip everything before start (this will keep the sync)
             START_MEASUREMENT
-            for(uint16_t j =  0; j < mCounter / 2u; j+=7) { asm volatile(""); }
+            for(j =  0; j < mCounterTmp / 2u; j+=TIMING_CONSTANT_2) { asm volatile(""); }
             STOP_MEASUREMENT
             for (uint8_t i = 9; i != 0; i--) {                  // 8-N-1 (will overwrite start bit)
                 buffer /= 2;                    // lshift
@@ -62,7 +64,9 @@ STOP_MEASUREMENT
                     buffer |= (1u << 7u);
                 }
                 START_MEASUREMENT
-                for(uint16_t j = 0; j < mCounter; j+=7) { asm volatile(""); }
+                j = mCounterTmp;
+                while((j-=TIMING_CONSTANT_1) > 0) {asm volatile("");}
+                //for(j = mCounterTmp; j > mCounter; j-=TIMING_CONSTANT_2) { asm volatile(""); }
                 STOP_MEASUREMENT
             }
             while (!isHigh()) {}                  // skip last low (stop bit)

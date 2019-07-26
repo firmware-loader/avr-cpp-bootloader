@@ -25,7 +25,7 @@ SET(PORT usb)		         	# <-- USB bzw. Schnittstelle z.B. /dev/cu.usbserial....
 
 SET(EEPROM NO)	     	        	# <-- soll eine x.eep Datei erstellt werden?
 SET(FLASH NO)		        	# <-- soll Geflasht werden?
-SET(ASM true)
+SET(ASM NO)
 
 SET(BOOTPOSITION 0x7C00)
 #SET(BOOTPOSITION 0x00)

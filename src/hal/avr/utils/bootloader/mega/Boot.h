@@ -18,7 +18,7 @@ namespace lib::avr::boot {
         [[noreturn]] static constexpr void (*start)() = 0x0000;
     public:
         template<typename T>
-        requires static_cast<bool>(utils::is_same<decltype(T()()), uint16_t>()) // is this a bug in gcc?
+        requires static_cast<bool>(utils::is_same<decltype(T()()), uint16_t>())
         static auto writeToFlash(T readMethod) {
             DDRB |= (1 << PB0);
             PORTB |= (1 << PB0);
