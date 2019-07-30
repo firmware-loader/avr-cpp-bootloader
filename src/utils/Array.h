@@ -33,7 +33,7 @@ namespace utils {
             return mElement;
         }
 
-        [[nodiscard]] constexpr T *end() {
+        [[nodiscard]] constexpr T *end() { 
             return mElement + N;
         }
 

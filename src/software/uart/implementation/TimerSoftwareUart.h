@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <util/delay.h>
 #include "SoftwareUart.h"
 #include "../../../hal/concepts/Pin.h"
 #include "../../Literals.h"
@@ -17,6 +18,7 @@ namespace lib::software {
         static int16_t bitcellLength;
         using timer = AbstractTimer<mcu>;
         static constexpr auto praeamble = 0x55;
+        static constexpr auto sync = 0xCC;
 
         static constexpr auto isHigh() {
             using pin = pin::Pin<mcu, 0>::value;

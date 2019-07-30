@@ -4,9 +4,10 @@
 
 #pragma once
 
-#define START_MEASUREMENT(x) asm(";START_MEASUREMENT_"#x);
-#define STOP_MEASUREMENT(x) asm(";STOP_MEASUREMENT_"#x);
-#define TIMING_CONSTANT(x) 42+x; asm(";TIMING_CONSTANT_"#x);
+#define START_MEASUREMENT asm volatile(";START_MEASUREMENT");
+#define STOP_MEASUREMENT asm volatile(";STOP_MEASUREMENT");
+#define TIMING_CONSTANT_1 5 /* TIMING_CONSTANT */
+#define TIMING_CONSTANT_2 7 /* TIMING_CONSTANT */
 
 
 

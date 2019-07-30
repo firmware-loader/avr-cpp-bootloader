@@ -10,8 +10,8 @@
 
 namespace lib::software {
     extern "C" {
-    volatile uint8_t receiveBuffer;
-    volatile uint16_t counterBuffer = 0;
+        volatile uint8_t receiveBuffer;
+        volatile int16_t counterBuffer = 0;
     }
     template<typename mcu, auto pinNumber>
     requires mcu::family == MCUFamilies::AVR && pin::isAbstractPin<pin::Pin<mcu, pinNumber>>
@@ -37,9 +37,10 @@ namespace lib::software {
                         rjmp receiveByte
                         ldi r21, lo8(8)
                 CL9:
-                        movw xl, %A[cb]
-                        lsr xh
-                        ror xl
+                        ;movw xl, %A[cb]
+                        ;lsr xh
+                        ;ror xl
+                        ;rcall Waitbitcell+1
                         ldi r21, 9
                 rxb3:
                         rcall WaitBitcell
@@ -105,4 +106,9 @@ namespace lib::software {
             pin::setInputState<pin::Pin<mcu, pinNumber>, pin::InputState::PULLUP>();
         }
     };
+
+    /*template<typename mcu, auto pinNumber>
+    uint8_t SoftwareUart<mcu, pinNumber, SoftUartMethod::InlineAssembler>::receiveBuffer = 0;
+    template<typename mcu, auto pinNumber>
+    int16_t SoftwareUart<mcu, pinNumber, SoftUartMethod::InlineAssembler>::counterBuffer = 0;*/
 }
