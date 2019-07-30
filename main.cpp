@@ -21,6 +21,7 @@ int main() {
     using bootloader = lib::avr::boot::BootloaderHal<mcu>;
 
     uart::init<9600_baud>();
+    softUPDI::init<9600_baud, 9600_baud>();
 
     DDRD |= (1 << PD2);
     /*softUart::init<9600_baud, 9600_baud>();

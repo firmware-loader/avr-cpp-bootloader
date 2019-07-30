@@ -8,25 +8,28 @@
 #include "../../uart/implementation/SoftwareUart.h"
 
 namespace lib::software {
+
     template<typename mcu, auto pinNumber>
     requires pin::isAbstractPin<pin::Pin < mcu, pinNumber>>
     class SoftwareUart<mcu, pinNumber, SoftUartMethod::UPDITimingBased> {
     private:
+        using Pin = pin::Pin<mcu, pinNumber>::value;
+        using output = Pin::Output;
+        using input = Pin::Input;
         static typename utils::max_type<typename mcu::mem_width, uint16_t>::type mCounter;
 
         static constexpr auto isHigh() {
-            using pin = pin::Pin<mcu, pinNumber>::value;
-            return (pin::get() != 0);
+            return (Pin::get() != 0);
         }
     public:
         template<Baud minBaud, Baud maxBaud>
         static constexpr void init() {
-            DDRD |= (1 << PD2);
-            using pin = pin::Pin<mcu, 2>::value;
-            pin::on();
+            Pin::template dir<output>();
+            Pin::on();
         }
 
         static auto waitForSync() {
+            Pin::template dir<input>();
             decltype(mCounter) tmp = 0;
             while (isHigh()) {}           //skip first high
             START_MEASUREMENT
@@ -43,6 +46,7 @@ namespace lib::software {
         }
 
         static mcu::mem_width receiveData() {
+            Pin::template dir<input>();
             uint8_t buffer = 0;
             uint16_t j = 0;
             uint16_t mCounterTmp = mCounter;
@@ -68,11 +72,17 @@ namespace lib::software {
         }
 
         static void sendData(uint8_t data) {
+            Pin::template dir<output>();
+            Pin::on();
             uint16_t j = 0;
             uint16_t mCounterTmp = mCounter;
-            using pin = pin::Pin<mcu, 2>::value;
 
-            pin::off();
+            START_MEASUREMENT
+            j = mCounterTmp;
+            while((j-=TIMING_CONSTANT_1) > 0) {asm volatile("");}
+            STOP_MEASUREMENT
+
+            Pin::off();
             START_MEASUREMENT
             j = mCounterTmp;
             while((j-=TIMING_CONSTANT_1) > 0) {asm volatile("");}
@@ -80,16 +90,16 @@ namespace lib::software {
 
             for (uint8_t i = 8; i != 0; i--) {
                 if(data & 1)
-                    pin::on();
+                    Pin::on();
                 else
-                    pin::off();
+                    Pin::off();
                 data /= 2;
                 START_MEASUREMENT
                 j = mCounterTmp;
                 while((j-=TIMING_CONSTANT_1) > 0) {asm volatile("");}
                 STOP_MEASUREMENT
             }
-            pin::on();
+            Pin::on();
             START_MEASUREMENT
             j = mCounterTmp;
             while((j-=TIMING_CONSTANT_1) > 0) {asm volatile("");}
