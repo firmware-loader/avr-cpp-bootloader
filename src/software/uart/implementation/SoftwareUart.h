@@ -22,7 +22,8 @@ namespace lib::software {
         Timer,
         Assembler,
         InlineAssembler,
-        TimingBased
+        TimingBased,
+        UPDITimingBased
     };
 
     template<typename mcu, auto pinNumber, SoftUartMethod method>
