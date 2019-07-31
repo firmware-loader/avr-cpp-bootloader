@@ -58,7 +58,7 @@ namespace lib::software {
 
         template<typename T> requires utils::is_arithmetic<T>::value
         static bool gotSignalBeforeTimout() {
-            using pin = pin::Pin<mcu, 0>::value;
+            using pin = pin::Pin<mcu, pinNumber>::value;
             for(T i = 0; i < utils::numeric_limits<T>::max(); i++) { // utils::numeric_limits<T>::max()
                 asm volatile("");
                 if(pin::get() == 0) {

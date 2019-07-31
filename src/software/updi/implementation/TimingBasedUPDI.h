@@ -5,13 +5,13 @@
 #pragma once
 #include "../../../utils/TypeTraits.h"
 #include "../../../utils/TimingUtils.h"
-#include "../../uart/implementation/SoftwareUart.h"
+#include "SoftwareUPDI.h"
 
 namespace lib::software {
 
     template<typename mcu, auto pinNumber>
     requires pin::isAbstractPin<pin::Pin < mcu, pinNumber>>
-    class SoftwareUart<mcu, pinNumber, SoftUartMethod::UPDITimingBased> {
+    class SoftwareUPDI<mcu, pinNumber, SoftUPDIMethod::UPDITimingBased> {
     private:
         using Pin = pin::Pin<mcu, pinNumber>::value;
         using output = Pin::Output;
@@ -24,8 +24,8 @@ namespace lib::software {
     public:
         template<Baud minBaud, Baud maxBaud>
         static constexpr void init() {
-            Pin::template dir<output>();
-            Pin::on();
+            Pin::template dir<input>();
+            //Pin::on();
         }
 
         static auto waitForSync() {
@@ -67,8 +67,15 @@ namespace lib::software {
                 while((j-=TIMING_CONSTANT_1) > 0) {asm volatile("");}
                 STOP_MEASUREMENT
             }
-            while (!isHigh()) {}                  // skip last low (stop bit)
+            while (!isHigh()) {}                  // skip last low (parity bit)
             return buffer;
+        }
+
+        static inline void WaitBitcell(uint16_t &j, const uint16_t &mCounterTmp) {
+            START_MEASUREMENT
+            j = mCounterTmp;
+            while ((j -= TIMING_CONSTANT_1) > 0) { asm volatile(""); }
+            STOP_MEASUREMENT
         }
 
         static void sendData(uint8_t data) {
@@ -77,16 +84,10 @@ namespace lib::software {
             uint16_t j = 0;
             uint16_t mCounterTmp = mCounter;
 
-            START_MEASUREMENT
-            j = mCounterTmp;
-            while((j-=TIMING_CONSTANT_1) > 0) {asm volatile("");}
-            STOP_MEASUREMENT
+            WaitBitcell(j, mCounterTmp);
 
             Pin::off();
-            START_MEASUREMENT
-            j = mCounterTmp;
-            while((j-=TIMING_CONSTANT_1) > 0) {asm volatile("");}
-            STOP_MEASUREMENT
+            WaitBitcell(j, mCounterTmp);
 
             for (uint8_t i = 8; i != 0; i--) {
                 if(data & 1)
@@ -94,23 +95,17 @@ namespace lib::software {
                 else
                     Pin::off();
                 data /= 2;
-                START_MEASUREMENT
-                j = mCounterTmp;
-                while((j-=TIMING_CONSTANT_1) > 0) {asm volatile("");}
-                STOP_MEASUREMENT
+                WaitBitcell(j, mCounterTmp);
             }
             Pin::on();
-            START_MEASUREMENT
-            j = mCounterTmp;
-            while((j-=TIMING_CONSTANT_1) > 0) {asm volatile("");}
-            STOP_MEASUREMENT
+            WaitBitcell(j, mCounterTmp);
         }
     };
 
 
 
     template<typename mcu, auto pinNumber>
-    typename utils::max_type<typename mcu::mem_width, uint16_t>::type SoftwareUart<mcu, pinNumber, SoftUartMethod::UPDITimingBased>::mCounter = 0;
+    typename utils::max_type<typename mcu::mem_width, uint16_t>::type SoftwareUPDI<mcu, pinNumber, SoftUPDIMethod::UPDITimingBased>::mCounter = 0;
 }
 
 
