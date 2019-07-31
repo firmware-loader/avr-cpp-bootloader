@@ -61,7 +61,7 @@ int main() {
         softUPDI::sendChar((*word)[14]);
         softUPDI::sendChar((*word)[15]);
         //uart::sendChar(word & 0xFF);
-        //uart::sendChar((word >> 8u));
+        //uart::sendChar((word >> 8u));*/
         /*uart::sendChar((word >> 16u));
         uart::sendChar((word >> 24u));
         uart::sendChar((word >> 32u));

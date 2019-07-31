@@ -34,6 +34,20 @@ namespace lib::software {
                         switch (data & 0x0F) {
                             case UPDI_CS_STATUSA:
                                 softUPDI::sendChar(0x30); // ?
+                                break;
+                            case UPDI_ASI_SYS_STATUS:
+                                // In Prog Mode |
+                                //TODO: Fully add status Info
+                                constexpr uint8_t status = (1 << UPDI_ASI_SYS_STATUS_NVMPROG);
+                                softUPDI::sendChar(status);
+                                break;
+                        }
+                        break;
+                    case UPDI_KEY:
+                        switch (data & 0x0F) {
+                            case UPDI_KEY_SIB | UPDI_SIB_16BYTES:
+                                softUPDI::sendString("_ATmega P:0D:1-");
+                                softUPDI::sendChar(0x10);
                         }
                 }
             }

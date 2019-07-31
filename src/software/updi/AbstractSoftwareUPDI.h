@@ -50,6 +50,13 @@ namespace lib::software {
             softUart::sendData(byte);
         }
 
+        static void sendString(const char* str) {
+            while (*str) {
+                softUart::sendData(static_cast<uint8_t>(*str));
+                str++;
+            }
+        }
+
         static uint8_t getByte() {
             softUart::waitForSync();
             return softUart::receiveData();
