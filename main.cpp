@@ -16,10 +16,10 @@ using mcu = lib::avr::ATMega328;
 
 int main() {
     using namespace lib::software::literals;
-    using uart = lib::software::Uart<mcu>;
-    using softUart = lib::software::AbstractSoftwareUart<mcu, 0, lib::software::SoftUartMethod::Timer>;
-    using softUPDI = lib::software::AbstractSoftwareUPDI<mcu, 0, lib::software::SoftUPDIMethod::UPDITimingBased>;
-    using bootloader = lib::avr::boot::BootloaderHal<mcu>;
+    //using uart = lib::software::Uart<mcu>;
+    //using softUart = lib::software::AbstractSoftwareUart<mcu, 0, lib::software::SoftUartMethod::Timer>;
+    //using softUPDI = lib::software::AbstractSoftwareUPDI<mcu, 0, lib::software::SoftUPDIMethod::UPDITimingBased>;
+    //using bootloader = lib::avr::boot::BootloaderHal<mcu>;
     using updiProtocol = lib::software::UPDIProtocol<mcu, 0>;
 
 

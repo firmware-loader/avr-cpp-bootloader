@@ -57,6 +57,10 @@ namespace lib::software {
             }
         }
 
+        static uint8_t getByteWithoutSync() {
+            return softUart::receiveData();
+        }
+
         static uint8_t getByte() {
             softUart::waitForSync();
             return softUart::receiveData();
