@@ -13,13 +13,13 @@ static constexpr uint16_t UPDI_ADDRESS_OFFSET = 0x2000;
 static constexpr uint8_t UPDI_BREAK = 0x00;
 
 static constexpr uint8_t UPDI_LDS = 0x00;
-static constexpr uint8_t UPDI_STS = 0x40;
-static constexpr uint8_t UPDI_STCS = 0xC0; // (Store a value to Control/Status space)
-static constexpr uint8_t UPDI_LDCS = 0x80; // (Load data from Control/Status space)
-static constexpr uint8_t UPDI_KEY = 0xE0;
 static constexpr uint8_t UPDI_LD = 0x20;
+static constexpr uint8_t UPDI_STS = 0x40;
 static constexpr uint8_t UPDI_ST = 0x60;
+static constexpr uint8_t UPDI_LDCS = 0x80; // (Load data from Control/Status space)
 static constexpr uint8_t UPDI_REPEAT = 0xA0;
+static constexpr uint8_t UPDI_STCS = 0xC0; // (Store a value to Control/Status space)
+static constexpr uint8_t UPDI_KEY = 0xE0;
 
 static constexpr uint8_t UPDI_KEY_SIB = 0x04;
 

@@ -85,7 +85,7 @@ namespace lib::software {
                         if (flash_cmd == UPDI_NVMCTRL_CTRLA_CHIP_ERASE) {
                             //TODO: Erase Chip
                         } else if (flash_cmd == UPDI_NVMCTRL_CTRLA_PAGE_BUFFER_CLR) {
-                            //TODO: Clear Buffer
+                            //TODO: Clear Page Buffer
                         } else if(flash_cmd == UPDI_NVMCTRL_CTRLA_WRITE_PAGE) {
                             //TODO: Write Page
                         }
