@@ -83,13 +83,14 @@ namespace lib::software {
             Pin::on();
             uint16_t j = 0;
             uint16_t mCounterTmp = mCounter;
+            bool parity = getPairty(data);
 
             WaitBitcell(j, mCounterTmp);
 
             Pin::off();
             WaitBitcell(j, mCounterTmp);
 
-            for (uint8_t i = 8; i != 0; i--) {
+            for (uint8_t i = 0; i < 8; i++) {
                 if(data & 1)
                     Pin::on();
                 else
@@ -97,8 +98,21 @@ namespace lib::software {
                 data /= 2;
                 WaitBitcell(j, mCounterTmp);
             }
+            if(parity) {
+                Pin::on();
+            } else {
+                Pin::off();
+            };
+            WaitBitcell(j, mCounterTmp);
             Pin::on();
             WaitBitcell(j, mCounterTmp);
+        }
+
+        static bool getPairty(uint8_t data) {
+            data ^= data >> 4;
+            data ^= data >> 2;
+            data ^= data >> 1;
+            return (data) & 1;
         }
     };
 

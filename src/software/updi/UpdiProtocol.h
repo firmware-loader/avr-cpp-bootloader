@@ -10,8 +10,8 @@
 using namespace lib::software::literals;
 namespace lib::software {
     struct UPDIStore {
-        int16_t ptr = 0;
-        int16_t repeats = 0;
+        uint16_t ptr = 0;
+        uint16_t repeats = 0;
     };
 
     template<typename mcu, auto pinNumber>
@@ -60,32 +60,36 @@ namespace lib::software {
                         if(data & UPDI_PTR_ADDRESS) {
                             if(data & UPDI_DATA_16) {
                                 //16 Bit Data
-                                uint8_t lsb = softUPDI::getByteWithoutSync();
-                                uint8_t msb = softUPDI::getByteWithoutSync();
-                                store.ptr = (msb << 8) | lsb;
+                                store.ptr = getWordValue();
                                 store.repeats = 1;
                             } else {
                                 // 8 Bit
                                 store.ptr = softUPDI::getByte();
                             }
+                            softUPDI::sendChar(UPDI_PHY_ACK);
+                        } else if(data & UPDI_PTR_INC) {
+                            if(data & UPDI_DATA_16) {
+                                if(store.ptr >= UPDI_ADDRESS_OFFSET) {
+                                    writeToFlashBuffer();
+                                }
+                            }
                         }
-                        softUPDI::sendChar(UPDI_PHY_ACK);
                         break;
                     case UPDI_STS: {
                         if (data & UPDI_ADDRESS_16) {
-                            uint8_t lsb = softUPDI::getByteWithoutSync();
-                            uint8_t msb = softUPDI::getByteWithoutSync();
+                            getWordValue();
                         }
                         softUPDI::sendChar(UPDI_PHY_ACK);
 
                         uint8_t flash_cmd = softUPDI::getByteWithoutSync();
                         if (flash_cmd == UPDI_NVMCTRL_CTRLA_CHIP_ERASE) {
                             //TODO: Erase Chip
-                            softUPDI::sendChar(UPDI_PHY_ACK);
                         } else if (flash_cmd == UPDI_NVMCTRL_CTRLA_PAGE_BUFFER_CLR) {
                             //TODO: Clear Buffer
-                            softUPDI::sendChar(UPDI_PHY_ACK);
+                        } else if(flash_cmd == UPDI_NVMCTRL_CTRLA_WRITE_PAGE) {
+                            //TODO: Write Page
                         }
+                        softUPDI::sendChar(UPDI_PHY_ACK);
                         break;
                     }
                     case UPDI_LD:
@@ -95,28 +99,46 @@ namespace lib::software {
                                 for(uint8_t i = 0; i < store.repeats; i++) {
                                     softUPDI::sendChar(ptr_data[i]);
                                 }
+                            } else {
+                                if(store.ptr >= UPDI_ADDRESS_OFFSET) {
+                                    // TODO: send back flash
+                                    for(uint8_t i = 0; i < store.repeats * 2; i++) {
+                                        softUPDI::sendChar(i);
+                                    }
+                                }
                             }
                         }
                         break;
                     case UPDI_LDS:
                         if(data & UPDI_ADDRESS_16) {
-                            uint8_t lsb = softUPDI::getByteWithoutSync();
-                            uint8_t msb = softUPDI::getByteWithoutSync();
+                            getWordValue();
                         }
                         softUPDI::sendChar(0x0);
                         break;
                     case UPDI_REPEAT:
                         if(data & UPDI_REPEAT_WORD) {
                             // data is word
-                            uint8_t lsb = softUPDI::getByteWithoutSync();
-                            uint8_t msb = softUPDI::getByteWithoutSync();
-                            store.repeats = ((msb << 8) | lsb) + 1;
+                            store.repeats = getWordValue() + 1;
                         } else {
                             // data is byte
-                            store.repeats = softUPDI::getByteWithoutSync() + 1;
+                            store.repeats = softUPDI::getByteWithoutSync() + 1u;
                         }
                         break;
                 }
+            }
+        }
+
+        static uint16_t getWordValue() {
+            const uint8_t lsb = softUPDI::getByteWithoutSync();
+            const uint8_t msb = softUPDI::getByteWithoutSync();
+            return static_cast<uint16_t>(msb << 8u) | lsb;
+        }
+
+        static void writeToFlashBuffer() {
+            //TODO: write data to tmp flash page register
+            for (uint8_t i = 0; i < store.repeats * 2; i++) {
+                uint16_t realAddr = store.ptr - UPDI_ADDRESS_OFFSET;
+                softUPDI::getByteWithoutSync();
             }
         }
 

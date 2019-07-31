@@ -6,7 +6,9 @@
 #include <stdint.h>
 
 static constexpr uint8_t UPDI_DEVICE_ID[3] = {0x1e, 0x95, 0x0f}; //atmega328p
-static constexpr uint8_t UPDI_DEVICE_REVISION[1] = {0x01}; //atmega328p
+static constexpr uint8_t UPDI_DEVICE_REVISION[1] = {0x01}; //Rev. B
+
+static constexpr uint16_t UPDI_ADDRESS_OFFSET = 0x2000;
 
 static constexpr uint8_t UPDI_BREAK = 0x00;
 
