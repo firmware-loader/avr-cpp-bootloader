@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <avr/pgmspace.h>
 
 #include "AbstractSoftwareUPDI.h"
 #include "constants/UPDIConstants.h"
+#include "../../hal/avr/utils/bootloader/mega/UpdiBootloader.h"
 
 using namespace lib::software::literals;
 namespace lib::software {
@@ -22,25 +22,28 @@ namespace lib::software {
     class UPDIProtocol {
     private:
         using softUPDI = lib::software::AbstractSoftwareUPDI<mcu, pinNumber, lib::software::SoftUPDIMethod::UPDITimingBased>;
+        using bootloader = lib::avr::boot::UPDIBootloader<mcu>;
 
         [[noreturn]] static constexpr void (*start_pgm)() = 0x0000;
         static UPDIStore store;
     public:
         static void start() {
+            if(bootloader::resetReason() == lib::avr::boot::ResetReason::NOT_EXT_RESET) {
+                start_pgm();
+            }
 
             softUPDI::template init<9600_baud, 9600_baud>();
-            // initial 0x0
             if (!softUPDI::template gotSignalBeforeTimout<uint32_t>()) {
                 start_pgm();
             }
 
             while(true) {
                 uint8_t data = softUPDI::getByte();
-                updi_state_machine(data);
+                updiStateMachine(data);
             }
         }
 
-        static void updi_state_machine(uint8_t data) {
+        static void updiStateMachine(uint8_t data) {
             switch (data & 0xF0) {
                 case UPDI_STCS: { //ignore next
                     uint8_t value = softUPDI::getByteWithoutSync();
@@ -106,7 +109,7 @@ namespace lib::software {
                             if (store.ptr >= UPDI_ADDRESS_OFFSET) {
                                 uint16_t start_address = store.ptr - UPDI_ADDRESS_OFFSET;
                                 for (uint8_t i = 0; i < store.repeats * 2; i++) {
-                                    softUPDI::sendChar((uint8_t)pgm_read_byte(start_address + i)); 
+                                    softUPDI::sendChar(bootloader::readFlash(start_address + i));
                                 }
                             }
                         }
@@ -120,11 +123,11 @@ namespace lib::software {
                             if(store.flash_write_error) {
                                 softUPDI::sendChar(1 << UPDI_NVM_STATUS_WRITE_ERROR);
                             } else {
-                                if(boot_spm_busy()) {
+                                if(bootloader::flashBusy()) {
                                     softUPDI::sendChar(1 << UPDI_NVM_STATUS_FLASH_BUSY);
                                 } else {
                                     softUPDI::sendChar(UPDI_NVM_STATUS_READY);
-                                    boot_rww_enable();
+                                    bootloader::enableFlash();
                                 }
                             }
                         } else {
@@ -142,7 +145,7 @@ namespace lib::software {
             }
         }
 
-        void executeSTSControlCommand() {
+        static void executeSTSControlCommand() {
             uint8_t flash_cmd = softUPDI::getByteWithoutSync();
             if (flash_cmd == UPDI_NVMCTRL_CTRLA_CHIP_ERASE) {
                 //TODO: Erase Chip
@@ -150,7 +153,7 @@ namespace lib::software {
                 //TODO: Clear Page Buffer
             } else if (flash_cmd == UPDI_NVMCTRL_CTRLA_WRITE_PAGE) {
                 uint16_t startAddress = store.ptr - UPDI_ADDRESS_OFFSET;
-                boot_page_write(startAddress);
+                bootloader::writeFlashPage(startAddress);
             }
             softUPDI::sendChar(UPDI_PHY_ACK);
         }
@@ -162,12 +165,10 @@ namespace lib::software {
         }
 
         static void writeToFlashBuffer() {
-            //TODO: write data to tmp flash page register
             uint16_t startAddress = store.ptr - UPDI_ADDRESS_OFFSET;
-            boot_page_erase(startAddress);
-            boot_spm_busy_wait();
+            bootloader::clearFlashPage(startAddress);
             for (uint8_t i = 0; i < store.repeats * 2; i+=2) {
-                boot_page_fill(startAddress + i, getWordValue());
+                bootloader::fillFlashPage(startAddress + i, getWordValue());
             }
         }
 
