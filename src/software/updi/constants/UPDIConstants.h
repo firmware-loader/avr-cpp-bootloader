@@ -93,3 +93,4 @@ static constexpr uint8_t UPDI_NVMCTRL_CTRLA_WRITE_FUSE = 0x07;
 static constexpr uint8_t UPDI_NVM_STATUS_WRITE_ERROR = 2;
 static constexpr uint8_t UPDI_NVM_STATUS_EEPROM_BUSY = 1;
 static constexpr uint8_t UPDI_NVM_STATUS_FLASH_BUSY = 0;
+static constexpr uint8_t UPDI_NVM_STATUS_READY = 0x00;

@@ -15,7 +15,6 @@ namespace lib::software {
         uint16_t ptr = 0;
         uint16_t repeats = 0;
         bool flash_write_error = false;
-        bool flash_write_in_progress = false;
     };
 
 
@@ -59,10 +58,7 @@ namespace lib::software {
                             softUPDI::sendChar(0x30); // is this ack?
                             break;
                         case UPDI_ASI_SYS_STATUS:
-                            // In Prog Mode |
-                            //TODO: Fully add status Info
-                            constexpr uint8_t status = (1 << UPDI_ASI_SYS_STATUS_NVMPROG);
-                            softUPDI::sendChar(status);
+                            sendStatusInfo();
                             break;
                     }
                     break;
@@ -96,19 +92,7 @@ namespace lib::software {
                         getWordValue();
                     }
                     softUPDI::sendChar(UPDI_PHY_ACK);
-
-                    uint8_t flash_cmd = softUPDI::getByteWithoutSync();
-                    if (flash_cmd == UPDI_NVMCTRL_CTRLA_CHIP_ERASE) {
-                        //TODO: Erase Chip
-                    } else if (flash_cmd == UPDI_NVMCTRL_CTRLA_PAGE_BUFFER_CLR) {
-                        //TODO: Clear Page Buffer
-                    } else if (flash_cmd == UPDI_NVMCTRL_CTRLA_WRITE_PAGE) {
-                        //TODO: Write Page
-                        //uint16_t startAddress = store.ptr - UPDI_ADDRESS_OFFSET;
-                        //boot_page_write(startAddress);
-                        //boot_rww_enable();
-                    }
-                    softUPDI::sendChar(UPDI_PHY_ACK);
+                    executeSTSControlCommand();
                     break;
                 }
                 case UPDI_LD:
@@ -121,9 +105,8 @@ namespace lib::software {
                         } else {
                             if (store.ptr >= UPDI_ADDRESS_OFFSET) {
                                 uint16_t start_address = store.ptr - UPDI_ADDRESS_OFFSET;
-                                // TODO: send back flash
                                 for (uint8_t i = 0; i < store.repeats * 2; i++) {
-                                    softUPDI::sendChar((uint8_t)pgm_read_byte(start_address + i)); // start_address + i
+                                    softUPDI::sendChar((uint8_t)pgm_read_byte(start_address + i)); 
                                 }
                             }
                         }
@@ -140,7 +123,7 @@ namespace lib::software {
                                 if(boot_spm_busy()) {
                                     softUPDI::sendChar(1 << UPDI_NVM_STATUS_FLASH_BUSY);
                                 } else {
-                                    softUPDI::sendChar(0x0); //TODO: Check if Flash is ready!
+                                    softUPDI::sendChar(UPDI_NVM_STATUS_READY);
                                     boot_rww_enable();
                                 }
                             }
@@ -151,14 +134,25 @@ namespace lib::software {
                     break;
                 case UPDI_REPEAT:
                     if (data & UPDI_REPEAT_WORD) {
-                        // data is word
                         store.repeats = getWordValue() + 1;
                     } else {
-                        // data is byte
                         store.repeats = softUPDI::getByteWithoutSync() + 1u;
                     }
                     break;
             }
+        }
+
+        void executeSTSControlCommand() {
+            uint8_t flash_cmd = softUPDI::getByteWithoutSync();
+            if (flash_cmd == UPDI_NVMCTRL_CTRLA_CHIP_ERASE) {
+                //TODO: Erase Chip
+            } else if (flash_cmd == UPDI_NVMCTRL_CTRLA_PAGE_BUFFER_CLR) {
+                //TODO: Clear Page Buffer
+            } else if (flash_cmd == UPDI_NVMCTRL_CTRLA_WRITE_PAGE) {
+                uint16_t startAddress = store.ptr - UPDI_ADDRESS_OFFSET;
+                boot_page_write(startAddress);
+            }
+            softUPDI::sendChar(UPDI_PHY_ACK);
         }
 
         static uint16_t getWordValue() {
@@ -175,7 +169,13 @@ namespace lib::software {
             for (uint8_t i = 0; i < store.repeats * 2; i+=2) {
                 boot_page_fill(startAddress + i, getWordValue());
             }
-            boot_page_write(startAddress);
+        }
+
+        static void sendStatusInfo() {
+            //TODO: Fully add status Info
+            //We are already in prog mode... or at least we say so
+            constexpr uint8_t status = (1 << UPDI_ASI_SYS_STATUS_NVMPROG);
+            softUPDI::sendChar(status);
         }
 
         static constexpr const uint8_t* lookup_ptr() {
