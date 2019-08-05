@@ -13,7 +13,7 @@ namespace lib::software {
     class SoftwareUart<mcu, pinNumber, SoftUartMethod::Assembler> {
     private:
     public:
-        static inline auto receiveData() {
+        static auto receiveData() {
             return detail::getByte();
         }
 

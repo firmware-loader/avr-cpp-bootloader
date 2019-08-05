@@ -13,20 +13,11 @@
 #include "../../../utils/Utility.h"
 
 namespace lib::software {
-    enum class Sync : uint8_t {
-        Synced,
-        Syncing
-    };
-
-    enum class SoftUartMethod : uint8_t {
-        Timer,
-        Assembler,
-        InlineAssembler,
-        TimingBased,
+    enum class SoftUPDIMethod : uint8_t {
         UPDITimingBased
     };
 
-    template<typename mcu, auto pinNumber, SoftUartMethod method>
-    class SoftwareUart;
+    template<typename mcu, auto pinNumber, SoftUPDIMethod method>
+    class SoftwareUPDI;
 }
 

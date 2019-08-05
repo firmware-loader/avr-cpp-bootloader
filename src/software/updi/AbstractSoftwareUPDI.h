@@ -4,19 +4,14 @@
 
 #pragma once
 
-#include "implementation/SoftwareUart.h"
-#include "implementation/TimingBasedUart.h"
-#include "implementation/TimerSoftwareUart.h"
-#include "implementation/vendorspecific/InlineAssemblerSoftwareUart.h"
-#include "implementation/vendorspecific/AssemblerSoftwareUart.h"
-#include "implementation/vendorspecific/external/Sync.h"
+#include "implementation/TimingBasedUPDI.h"
 #include "../../utils/custom_limits.h"
 
 namespace lib::software {
-    template<typename mcu, auto pinNumber, SoftUartMethod method>
-    class AbstractSoftwareUart {
+    template<typename mcu, auto pinNumber, SoftUPDIMethod method>
+    class AbstractSoftwareUPDI {
     private:
-        using softUart = SoftwareUart<mcu, pinNumber, method>;
+        using softUart = SoftwareUPDI<mcu, pinNumber, method>;
         using selectedPin = pin::Pin<mcu, pinNumber>::value;
     public:
         static uint16_t getWord() {
@@ -51,6 +46,26 @@ namespace lib::software {
             return &value;
         }
 
+        static void sendChar(uint8_t byte) {
+            softUart::sendData(byte);
+        }
+
+        static void sendString(const char* str) {
+            while (*str) {
+                softUart::sendData(static_cast<uint8_t>(*str));
+                str++;
+            }
+        }
+
+        static uint8_t getByteWithoutSync() {
+            return softUart::receiveData();
+        }
+
+        static uint8_t getByte() {
+            softUart::waitForSync();
+            return softUart::receiveData();
+        }
+
         template<auto minBaud, auto maxBaud>
         static constexpr void init() {
              softUart::template init<minBaud, maxBaud>();
@@ -62,6 +77,7 @@ namespace lib::software {
             for(T i = 0; i < utils::numeric_limits<T>::max(); i++) { // utils::numeric_limits<T>::max()
                 asm volatile("");
                 if(pin::get() == 0) {
+                    while(pin::get() == 0) { asm volatile(""); }
                     return true;
                 }
             }

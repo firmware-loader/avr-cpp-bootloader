@@ -9,7 +9,7 @@ SET(CMAKE_CXX_STANDARD 20)
 #============================================================================================
 PROJECT(Bootloader CXX ASM)		  		# <-- Prjektname
 
-SET(FILES main.cpp src/hal/avr/mcus/mega328/Mega328.h src/hal/avr/Register.h src/lib/type_traits.h src/abstraction/uart/AbstractUart.h src/concepts/McuCheck.h src/hal/avr/pin/Control.h src/hal/avr/utils/AvrUtils.h src/hal/avr/utils/Uart.h src/hal/MCUFamilies.h src/software/uart/implementation/SoftwareUart.h src/hal/avr/utils/Timer16.h src/hal/avr/mcus/mega328/PinMap.h src/abstraction/pins/PinControl.h src/hal/avr/utils/Timer8.h src/abstraction/timer/AbstractTimer.h src/utils/custom_limits.h src/utils/TypeTraits.h src/concepts/TypeCheck.h src/hal/avr/utils/bootloader/mega/Boot.h src/utils/Utility.h src/software/uart/implementation/TimerSoftwareUart.h src/software/uart/implementation/vendorspecific/AssemblerSoftwareUart.h src/hal/concepts/Pin.h src/software/Literals.h src/software/uart/implementation/vendorspecific/external/Sync.h src/software/uart/implementation/vendorspecific/external/Sync.S src/software/uart/implementation/vendorspecific/InlineAssemblerSoftwareUart.h src/utils/Array.cpp src/utils/Array.h src/software/uart/AbstractSoftwareUart.h src/software/uart/implementation/TimingBasedUart.h src/utils/TimingUtils.h)		  	# <-- Quelldatei(en)
+SET(FILES main.cpp src/hal/avr/mcus/mega328/Mega328.h src/hal/avr/Register.h src/lib/type_traits.h src/abstraction/uart/AbstractUart.h src/concepts/McuCheck.h src/hal/avr/pin/Control.h src/hal/avr/utils/AvrUtils.h src/hal/avr/utils/Uart.h src/hal/MCUFamilies.h src/software/uart/implementation/SoftwareUart.h src/hal/avr/utils/Timer16.h src/hal/avr/mcus/mega328/PinMap.h src/abstraction/pins/PinControl.h src/hal/avr/utils/Timer8.h src/abstraction/timer/AbstractTimer.h src/utils/custom_limits.h src/utils/TypeTraits.h src/concepts/TypeCheck.h src/hal/avr/utils/bootloader/mega/Boot.h src/utils/Utility.h src/software/uart/implementation/TimerSoftwareUart.h src/software/uart/implementation/vendorspecific/AssemblerSoftwareUart.h src/hal/concepts/Pin.h src/software/Literals.h src/software/uart/implementation/vendorspecific/external/Sync.h src/software/uart/implementation/vendorspecific/external/Sync.S src/software/uart/implementation/vendorspecific/InlineAssemblerSoftwareUart.h src/utils/Array.cpp src/utils/Array.h src/software/uart/AbstractSoftwareUart.h src/software/uart/implementation/TimingBasedUart.h src/utils/TimingUtils.h src/software/updi/implementation/TimingBasedUPDI.h src/software/updi/AbstractSoftwareUPDI.h src/software/updi/implementation/SoftwareUPDI.h src/software/updi/constants/UPDIConstants.h src/software/updi/UpdiProtocol.h)		  	# <-- Quelldatei(en)
 
 SET(DEVICE atmega328p)			# <-- MCU
 SET(FREQ 16000000)			# <-- MCU-Frequenz
@@ -27,8 +27,13 @@ SET(EEPROM NO)	     	        	# <-- soll eine x.eep Datei erstellt werden?
 SET(FLASH NO)		        	# <-- soll Geflasht werden?
 SET(ASM NO)
 
-SET(BOOTPOSITION 0x7C00)
+SET(BOOTPOSITION 0x7800)
 #SET(BOOTPOSITION 0x00)
+
+SET(UPDI 1)
+SET(UNIDIRECTIONAL 2)
+SET(DEBUG 3)
+SET(PROTOCOL ${UPDI})
 
 #============================================================================================
 
@@ -49,6 +54,19 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 SET(CMAKE_PREFIX_PATH  "/bin/gcc9/linux/")
 SET(CMAKE_EXECUTABLE_SUFFIX ".elf")
 SET(CMAKE_VERBOSE_MAKEFILE ON)
+
+
+add_compile_definitions(FLAG_UPDI=${UPDI})
+add_compile_definitions(FLAG_UNIDIRECTIONAL=${UNIDIRECTIONAL})
+add_compile_definitions(FLAG_DEBUG=${DEBUG})
+
+
+if(PROTOCOL MATCHES ${UPDI} OR PROTOCOL MATCHES ${UNIDIRECTIONAL} OR PROTOCOL MATCHES ${DEBUG})
+    add_compile_definitions(PROTOCOL=${PROTOCOL})
+elseif()
+    message(FATAL_ERROR "Only 'UPDI', 'DEBUG' or 'UNIDIRECTIONAL' are supported protocols!")
+endif()
+
 
 set_property(DIRECTORY PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
         "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.hex"
