@@ -27,8 +27,13 @@ SET(EEPROM NO)	     	        	# <-- soll eine x.eep Datei erstellt werden?
 SET(FLASH NO)		        	# <-- soll Geflasht werden?
 SET(ASM NO)
 
-SET(BOOTPOSITION 0x7C00)
+SET(BOOTPOSITION 0x7800)
 #SET(BOOTPOSITION 0x00)
+
+SET(UPDI 1)
+SET(UNIDIRECTIONAL 2)
+SET(DEBUG 3)
+SET(PROTOCOL ${UPDI})
 
 #============================================================================================
 
@@ -49,6 +54,19 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 SET(CMAKE_PREFIX_PATH  "/bin/gcc9/linux/")
 SET(CMAKE_EXECUTABLE_SUFFIX ".elf")
 SET(CMAKE_VERBOSE_MAKEFILE ON)
+
+
+add_compile_definitions(FLAG_UPDI=${UPDI})
+add_compile_definitions(FLAG_UNIDIRECTIONAL=${UNIDIRECTIONAL})
+add_compile_definitions(FLAG_DEBUG=${DEBUG})
+
+
+if(PROTOCOL MATCHES ${UPDI} OR PROTOCOL MATCHES ${UNIDIRECTIONAL} OR PROTOCOL MATCHES ${DEBUG})
+    add_compile_definitions(PROTOCOL=${PROTOCOL})
+elseif()
+    message(FATAL_ERROR "Only 'UPDI', 'DEBUG' or 'UNIDIRECTIONAL' are supported protocols!")
+endif()
+
 
 set_property(DIRECTORY PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
         "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.hex"

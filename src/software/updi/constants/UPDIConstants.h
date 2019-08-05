@@ -5,10 +5,17 @@
 #pragma once
 #include <stdint.h>
 
+/* You may change the following values: */
+
 static constexpr uint8_t UPDI_DEVICE_ID[3] = {0x1e, 0x95, 0x0f}; //atmega328p
 static constexpr uint8_t UPDI_DEVICE_REVISION[1] = {0x01}; //Rev. B
 
 static constexpr uint16_t UPDI_ADDRESS_OFFSET = 0x2000;
+static constexpr uint16_t NVMCTRL_ADDRESS = 0x1000;
+
+static constexpr auto DEVICE_STRING = "_ATmega P:0D:1-\x10";
+
+/* DO NOT CHANGE ANYTHING BELOW */
 
 static constexpr uint8_t UPDI_BREAK = 0x00;
 
@@ -43,8 +50,17 @@ static constexpr uint8_t UPDI_ASI_SYS_STATUS_NVMPROG = 3;
 static constexpr uint8_t UPDI_ASI_SYS_STATUS_UROWPROG = 2;
 static constexpr uint8_t UPDI_ASI_SYS_STATUS_LOCKSTATUS = 0;
 
+static constexpr uint8_t UPDI_RESET_REQ_VALUE = 0x59;
+
+static constexpr uint8_t UPDI_ASI_RESET_REQ = 0x08;
+static constexpr uint8_t UPDI_ASI_CTRLA = 0x09;
+static constexpr uint8_t UPDI_ASI_SYS_CTRLA = 0x0A;
+static constexpr uint8_t UPDI_ASI_CRC_STATUS = 0x0C;
+
 static constexpr uint8_t UPDI_PHY_SYNC = 0x55;
 static constexpr uint8_t UPDI_PHY_ACK = 0x40;
+
+static constexpr uint8_t UPDI_MAX_REPEAT_SIZE = 0xFF;
 
 static constexpr uint8_t UPDI_PTR = 0x00;
 static constexpr uint8_t UPDI_PTR_INC = 0x04;
@@ -59,6 +75,10 @@ static constexpr uint8_t UPDI_DATA_16 = 0x01;
 static constexpr uint8_t UPDI_REPEAT_BYTE = 0x00;
 static constexpr uint8_t UPDI_REPEAT_WORD = 0x01;
 
+// FLASH CONTROLLER
+static constexpr uint8_t UPDI_NVMCTRL_CTRLA = 0x00;
+static constexpr uint8_t UPDI_NVMCTRL_CTRLB = 0x01;
+static constexpr uint8_t UPDI_NVMCTRL_STATUS = 0x02;
 
 //CTRLA
 static constexpr uint8_t UPDI_NVMCTRL_CTRLA_NOP = 0x00;
@@ -69,3 +89,7 @@ static constexpr uint8_t UPDI_NVMCTRL_CTRLA_PAGE_BUFFER_CLR = 0x04;
 static constexpr uint8_t UPDI_NVMCTRL_CTRLA_CHIP_ERASE = 0x05;
 static constexpr uint8_t UPDI_NVMCTRL_CTRLA_ERASE_EEPROM = 0x06;
 static constexpr uint8_t UPDI_NVMCTRL_CTRLA_WRITE_FUSE = 0x07;
+
+static constexpr uint8_t UPDI_NVM_STATUS_WRITE_ERROR = 2;
+static constexpr uint8_t UPDI_NVM_STATUS_EEPROM_BUSY = 1;
+static constexpr uint8_t UPDI_NVM_STATUS_FLASH_BUSY = 0;
