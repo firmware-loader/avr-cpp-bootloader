@@ -6,8 +6,10 @@
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 #include <avr/boot.h>
-
-#define SPMControllRegister SPMCSR
+//Prevent Libary Bug
+#ifndef RWWSRE
+#define RWWSRE 4
+#endif
 
 namespace lib::avr::boot {
     enum class ResetReason {
@@ -18,6 +20,8 @@ namespace lib::avr::boot {
 
     template<typename mcu>  requires mcu::family == MCUFamilies::AVR
     class UPDIBootloader {
+    private:
+        static constexpr auto BOOTLOADER_ADDR = 0x300;
     public:
         static ResetReason resetReason() {
             uint8_t mcusr = MCUSR;
@@ -54,7 +58,7 @@ namespace lib::avr::boot {
         }
 
         static void enableFlash() {
-            //boot_rww_enable();
+            boot_rww_enable();
         }
     };
 }
