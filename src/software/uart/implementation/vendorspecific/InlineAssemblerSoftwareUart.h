@@ -14,7 +14,7 @@ namespace lib::software {
         volatile int16_t counterBuffer = 0;
     }
     template<typename mcu, auto pinNumber>
-    requires mcu::family == MCUFamilies::AVR && pin::isAbstractPin<pin::Pin<mcu, pinNumber>>
+    requires mcu::family == MCUFamilies::AVR && pin::isAbstractPin<::pin::Pin<mcu, pinNumber>>
     class SoftwareUart<mcu, pinNumber, SoftUartMethod::InlineAssembler> {
     private:
         static constexpr auto RXBIT = 0;
@@ -102,8 +102,8 @@ namespace lib::software {
 
         template<auto minBaud, auto maxBaud>
         static constexpr void init() {
-            pin::setDirection<pin::Pin<mcu, pinNumber>, pin::Direction::INPUT>();
-            pin::setInputState<pin::Pin<mcu, pinNumber>, pin::InputState::PULLUP>();
+            pin::setDirection<::pin::Pin<mcu, pinNumber>, pin::Direction::INPUT>();
+            pin::setInputState<::pin::Pin<mcu, pinNumber>, pin::InputState::PULLUP>();
         }
     };
 

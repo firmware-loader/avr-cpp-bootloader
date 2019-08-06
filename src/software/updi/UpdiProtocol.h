@@ -7,7 +7,12 @@
 
 #include "AbstractSoftwareUPDI.h"
 #include "constants/UPDIConstants.h"
+#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168__)
 #include "../../hal/avr/utils/bootloader/mega/UpdiBootloader.h"
+#endif
+#ifdef __AVR_ATtiny2313__
+#include "../../hal/avr/utils/bootloader/tiny/UpdiBootloader.h"
+#endif
 
 using namespace lib::software::literals;
 namespace lib::software {
