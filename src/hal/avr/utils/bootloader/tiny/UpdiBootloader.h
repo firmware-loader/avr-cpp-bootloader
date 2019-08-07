@@ -49,7 +49,7 @@ namespace lib::avr::boot {
         }
 
         static void clearFlashPage(uint16_t page) {
-            boot_page_erase ((uint32_t) (page));
+            boot_page_erase (page);
             boot_spm_busy_wait ();
         }
 
