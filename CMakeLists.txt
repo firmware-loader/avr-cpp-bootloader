@@ -29,12 +29,12 @@ SET(FLASH NO)		        	# <-- soll Geflasht werden?
 SET(ASM YES)
 
 #SET(BOOTPOSITION 0x7800)
-SET(BOOTPOSITION 0x00)
+SET(BOOTPOSITION 0x5DC)
 
 SET(UPDI 1)
 SET(UNIDIRECTIONAL 2)
 SET(DEBUG 3)
-SET(PROTOCOL ${UPDI})
+SET(PROTOCOL ${UNIDIRECTIONAL})
 
 #============================================================================================
 

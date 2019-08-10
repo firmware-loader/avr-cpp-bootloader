@@ -10,7 +10,6 @@
 #if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168__)
 #include "src/hal/avr/mcus/mega328/Mega328.h"
 #include "src/abstraction/uart/AbstractUart.h"
-#include "src/hal/avr/utils/bootloader/mega/Boot.h"
 #endif
 
 #include "src/software/uart/implementation/SoftwareUart.h"
@@ -18,6 +17,7 @@
 #include "src/software/uart/AbstractSoftwareUart.h"
 #include "src/software/updi/AbstractSoftwareUPDI.h"
 #include "src/software/updi/UpdiProtocol.h"
+#include "src/hal/avr/utils/bootloader/mega/Boot.h"
 
 #if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168__)
 using mcu = lib::avr::ATMega328;
@@ -30,7 +30,7 @@ int main() {
     using namespace lib::software::literals;
 
 #if (PROTOCOL == FLAG_DEBUG) || (PROTOCOL == FLAG_UNIDIRECTIONAL)
-    using softUart = lib::software::AbstractSoftwareUart<mcu, 0, lib::software::SoftUartMethod::Timer>;
+    using softUart = lib::software::AbstractSoftwareUart<mcu, 0, lib::software::SoftUartMethod::TimingBased>;
     using bootloader = lib::avr::boot::BootloaderHal<mcu>;
 #endif
 
