@@ -11,8 +11,8 @@ PROJECT(Bootloader CXX ASM)		  		# <-- Prjektname
 
 SET(FILES main.cpp src/hal/avr/mcus/mega328/Mega328.h src/hal/avr/Register.h src/lib/type_traits.h src/abstraction/uart/AbstractUart.h src/concepts/McuCheck.h src/hal/avr/pin/Control.h src/hal/avr/utils/AvrUtils.h src/hal/avr/utils/Uart.h src/hal/MCUFamilies.h src/software/uart/implementation/SoftwareUart.h src/hal/avr/utils/Timer16.h src/hal/avr/mcus/mega328/PinMap.h src/abstraction/pins/PinControl.h src/hal/avr/utils/Timer8.h src/abstraction/timer/AbstractTimer.h src/utils/custom_limits.h src/utils/TypeTraits.h src/concepts/TypeCheck.h src/hal/avr/utils/bootloader/mega/Boot.h src/hal/avr/utils/bootloader/mega/UpdiBootloader src/utils/Utility.h src/software/uart/implementation/TimerSoftwareUart.h src/software/uart/implementation/vendorspecific/AssemblerSoftwareUart.h src/hal/concepts/Pin.h src/software/Literals.h src/software/uart/implementation/vendorspecific/external/Sync.h src/software/uart/implementation/vendorspecific/external/Sync.S src/software/uart/implementation/vendorspecific/InlineAssemblerSoftwareUart.h src/utils/Array.cpp src/utils/Array.h src/software/uart/AbstractSoftwareUart.h src/software/uart/implementation/TimingBasedUart.h src/utils/TimingUtils.h src/software/updi/implementation/TimingBasedUPDI.h src/software/updi/AbstractSoftwareUPDI.h src/software/updi/implementation/SoftwareUPDI.h src/software/updi/constants/UPDIConstants.h src/software/updi/UpdiProtocol.h src/hal/avr/mcus/tiny2313/tiny2313.h src/hal/avr/mcus/tiny2313/PinMap.h)		  	# <-- Quelldatei(en)
 
-#SET(DEVICE atmega328p)			# <-- MCU
-SET(DEVICE attiny2313)
+SET(DEVICE atmega328p)			# <-- MCU
+#SET(DEVICE attiny2313)
 SET(FREQ 8000000)			# <-- MCU-Frequenz
 
 SET(AVRBIN "/bin/gcc9/linux/bin/")		# <-- Toolchain
@@ -28,13 +28,13 @@ SET(EEPROM NO)	     	        	# <-- soll eine x.eep Datei erstellt werden?
 SET(FLASH NO)		        	# <-- soll Geflasht werden?
 SET(ASM YES)
 
-#SET(BOOTPOSITION 0x7800)
-SET(BOOTPOSITION 0x5DC)
+SET(BOOTPOSITION 0x7800)
+#SET(BOOTPOSITION 0x5DC)
 
 SET(UPDI 1)
 SET(UNIDIRECTIONAL 2)
 SET(DEBUG 3)
-SET(PROTOCOL ${UNIDIRECTIONAL})
+SET(PROTOCOL ${UPDI})
 
 #============================================================================================
 

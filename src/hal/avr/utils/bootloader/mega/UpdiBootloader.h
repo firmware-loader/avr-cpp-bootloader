@@ -5,6 +5,7 @@
 #pragma once
 #include <avr/io.h>
 #include <avr/pgmspace.h>
+#include <avr/boot.h>
 
 namespace lib::avr::boot {
     enum class ResetReason {

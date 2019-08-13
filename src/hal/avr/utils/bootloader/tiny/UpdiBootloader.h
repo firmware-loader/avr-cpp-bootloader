@@ -7,8 +7,10 @@
 #include <avr/pgmspace.h>
 #include <avr/boot.h>
 //Prevent Libary Bug
+#ifdef __AVR_ATtiny2313__
 #ifndef RWWSRE
 #define RWWSRE 4
+#endif
 #endif
 
 namespace lib::avr::boot {
