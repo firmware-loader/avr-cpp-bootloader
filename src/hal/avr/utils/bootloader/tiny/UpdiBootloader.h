@@ -6,6 +6,12 @@
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 #include <avr/boot.h>
+//Prevent Libary Bug
+#ifdef __AVR_ATtiny2313__
+#ifndef RWWSRE
+#define RWWSRE 4
+#endif
+#endif
 
 namespace lib::avr::boot {
     enum class ResetReason {
@@ -16,6 +22,8 @@ namespace lib::avr::boot {
 
     template<typename mcu>  requires mcu::family == MCUFamilies::AVR
     class UPDIBootloader {
+    private:
+        static constexpr auto BOOTLOADER_ADDR = 0x300;
     public:
         static ResetReason resetReason() {
             uint8_t mcusr = MCUSR;
@@ -43,8 +51,8 @@ namespace lib::avr::boot {
         }
 
         static void clearFlashPage(uint16_t page) {
-            boot_page_erase(page);
-            boot_spm_busy_wait();
+            boot_page_erase (page);
+            boot_spm_busy_wait ();
         }
 
         static void fillFlashPage(uint16_t addr, uint16_t content) {

@@ -63,8 +63,8 @@ namespace lib::software {
             static_assert(ullMinBaud <= ullMaxBaud, "Minimum Baud has to be below or equal to maximum baud!");
 
 
-            pin::setDirection<pin::Pin<mcu, pinNumber>, pin::Direction::INPUT>();
-            pin::setInputState<pin::Pin<mcu, pinNumber>, pin::InputState::PULLUP>();
+            pin::setDirection<::pin::Pin<mcu, pinNumber>, pin::Direction::INPUT>();
+            pin::setInputState<::pin::Pin<mcu, pinNumber>, pin::InputState::PULLUP>();
         }
 
         static void waitForSync() {

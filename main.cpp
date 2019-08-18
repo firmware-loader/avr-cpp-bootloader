@@ -2,23 +2,35 @@
 #undef AVR
 #endif
 
+#ifdef __AVR_ATtiny2313__
+#include "src/hal/avr/mcus/tiny2313/tiny2313.h"
+#include "src/hal/avr/mcus/tiny2313/PinMap.h"
+#endif
+
+#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168__)
 #include "src/hal/avr/mcus/mega328/Mega328.h"
 #include "src/abstraction/uart/AbstractUart.h"
+#endif
+
 #include "src/software/uart/implementation/SoftwareUart.h"
 #include "src/software/uart/implementation/TimerSoftwareUart.h"
 #include "src/software/uart/AbstractSoftwareUart.h"
-#include "src/hal/avr/utils/bootloader/mega/Boot.h"
 #include "src/software/updi/AbstractSoftwareUPDI.h"
 #include "src/software/updi/UpdiProtocol.h"
+#include "src/hal/avr/utils/bootloader/mega/Boot.h"
 
-
+#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168__)
 using mcu = lib::avr::ATMega328;
+#endif
+#ifdef __AVR_ATtiny2313__
+using mcu = lib::avr::ATTiny2313;
+#endif
 
 int main() {
     using namespace lib::software::literals;
 
 #if (PROTOCOL == FLAG_DEBUG) || (PROTOCOL == FLAG_UNIDIRECTIONAL)
-    using softUart = lib::software::AbstractSoftwareUart<mcu, 0, lib::software::SoftUartMethod::Timer>;
+    using softUart = lib::software::AbstractSoftwareUart<mcu, 0, lib::software::SoftUartMethod::TimingBased>;
     using bootloader = lib::avr::boot::BootloaderHal<mcu>;
 #endif
 
@@ -57,4 +69,5 @@ int main() {
         uart::sendChar((*word)[15]);
     }
 #endif
+    return 0;
 }

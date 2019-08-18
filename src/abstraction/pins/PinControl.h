@@ -2,7 +2,9 @@
 // Created by Sebastian on 12.05.2019.
 //
 
+#if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168__)
 #include "../../hal/avr/mcus/mega328/PinMap.h"
+#endif
 #pragma once
 
 namespace pin {
